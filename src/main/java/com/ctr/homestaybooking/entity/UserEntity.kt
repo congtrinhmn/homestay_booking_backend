@@ -1,6 +1,6 @@
 package com.ctr.homestaybooking.entity
 
-import com.ctr.homestaybooking.controller.user.dto.UserDTO
+import com.ctr.homestaybooking.controller.user.dto.UserDto
 import com.ctr.homestaybooking.shared.FORMAT_DATE
 import com.ctr.homestaybooking.shared.enums.Gender
 import com.ctr.homestaybooking.shared.enums.UserStatus
@@ -9,6 +9,9 @@ import java.util.*
 import javax.persistence.*
 import javax.validation.constraints.NotBlank
 
+/**
+ * Created by at-trinhnguyen2 on 2020/10/16
+ */
 @Entity
 @Table(name = "users")
 data class UserEntity(
@@ -55,7 +58,7 @@ data class UserEntity(
         @Enumerated(EnumType.STRING)
         var status: UserStatus = UserStatus.ACTIVE
 ) {
-        fun toUserDto(): UserDTO {
-                return UserDTO(id, email, uuid, deviceToken, roleEntities, firstName, lastName, gender, birthday, phone_number)
-        }
+    fun toUserDto(): UserDto {
+        return UserDto(id, email, uuid, deviceToken, roleEntities, firstName, lastName, gender, birthday, phone_number)
+    }
 }

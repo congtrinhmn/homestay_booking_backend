@@ -1,4 +1,4 @@
-package com.ctr.homestaybooking.controller.user.exception
+package com.ctr.homestaybooking.controller.user
 
 import com.ctr.homestaybooking.shared.model.ApiError
 import com.ctr.homestaybooking.shared.model.Response
@@ -23,10 +23,17 @@ class UserExceptionController {
     fun exception(exception: UserIsNotExistsException): ResponseEntity<Any> {
         return Response.buildResponseError(ApiError(HttpStatus.BAD_GATEWAY, exception))
     }
+
+    @ExceptionHandler(value = [RoleIsNotExistsException::class])
+    fun exception(exception: RoleIsNotExistsException): ResponseEntity<Any> {
+        return Response.buildResponseError(ApiError(HttpStatus.BAD_GATEWAY, exception))
+    }
 }
 
 class UserNotFoundException(id: Int) : RuntimeException("User id not found : $id")
 
+class UserIsExistsException(id: Int) : RuntimeException("User is exist with id: $id")
+
 class UserIsNotExistsException(id: Int) : RuntimeException("User is not exist with id: $id")
 
-class UserIsExistsException(id: Int) : RuntimeException("User is exist with id: $id")
+class RoleIsNotExistsException(id: Int) : RuntimeException("Role is not exist with id: $id")

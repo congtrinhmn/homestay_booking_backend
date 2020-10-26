@@ -11,7 +11,7 @@ import javax.persistence.Enumerated
 import javax.validation.constraints.NotBlank
 import javax.validation.constraints.Pattern
 
-data class UserDTO(
+data class UserDto(
         val id: Int = 0,
 
         @field: NotBlank(message = NOT_BLANK_EMAIL)

@@ -7,8 +7,8 @@ import javax.validation.constraints.NotNull
  * Created by at-trinhnguyen2 on 2020/10/16
  */
 @Entity
-@Table(name = "roles")
-data class RoleEntity(
+@Table(name = "amenities")
+data class AmenityEntity(
         @Id
         @GeneratedValue(strategy = GenerationType.IDENTITY)
         var id: Int = 0,
