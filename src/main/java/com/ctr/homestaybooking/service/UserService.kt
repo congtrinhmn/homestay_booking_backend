@@ -1,8 +1,9 @@
 package com.ctr.homestaybooking.service
 
-import com.ctr.homestaybooking.controller.user.exception.UserIsExistsException
-import com.ctr.homestaybooking.controller.user.exception.UserIsNotExistsException
-import com.ctr.homestaybooking.controller.user.exception.UserNotFoundException
+import com.ctr.homestaybooking.controller.user.RoleIsNotExistsException
+import com.ctr.homestaybooking.controller.user.UserIsExistsException
+import com.ctr.homestaybooking.controller.user.UserIsNotExistsException
+import com.ctr.homestaybooking.controller.user.UserNotFoundException
 import com.ctr.homestaybooking.entity.RoleEntity
 import com.ctr.homestaybooking.entity.UserEntity
 import com.ctr.homestaybooking.repository.RoleRepository
@@ -17,11 +18,10 @@ import org.springframework.stereotype.Service
 class UserService(private val userRepository: UserRepository,
                   private val roleRepository: RoleRepository) {
 
-    val allUser: List<UserEntity> = userRepository.findAll().filterIsInstance<UserEntity>()
+    fun getAllUser(): List<UserEntity> = userRepository.findAll().filterIsInstance<UserEntity>()
 
     fun getUserById(id: Int): UserEntity {
-        return userRepository.findById(id).toNullable()
-                ?: throw UserNotFoundException(id)
+        return userRepository.findById(id).toNullable() ?: throw UserNotFoundException(id)
     }
 
     fun getUserByEmail(email: String): UserEntity {
@@ -29,7 +29,7 @@ class UserService(private val userRepository: UserRepository,
                 ?: throw UserNotFoundException(0)
     }
 
-    fun addNewUser(userEntity: UserEntity): UserEntity {
+    fun addUser(userEntity: UserEntity): UserEntity {
         val userEntityFromDataBase = userRepository.findByEmail(userEntity.email)
         if (userEntityFromDataBase != null) {
             throw UserIsExistsException(userEntityFromDataBase.id)
@@ -39,7 +39,7 @@ class UserService(private val userRepository: UserRepository,
             userEntity.roleEntities = roleEntities
         }
         userEntity.password = BCryptPasswordEncoder().encode(userEntity.password)
-        return userRepository.save(userEntity.apply { println("-- addNewUser ${this}") })
+        return userRepository.save(userEntity)
     }
 
     fun editUser(userEntity: UserEntity): UserEntity {
@@ -52,7 +52,7 @@ class UserService(private val userRepository: UserRepository,
         return userRepository.findById(user.id).get()
     }
 
-    fun deleteUserFollowId(id: Int) {
+    fun deleteUserById(id: Int) {
         if (!userRepository.existsById(id)) {
             throw UserIsNotExistsException(id)
         }
@@ -69,19 +69,22 @@ class UserService(private val userRepository: UserRepository,
         return userEntity
     }
 
-    fun searchUsers(keySearch: String): List<UserEntity> {
+    fun search(keySearch: String): List<UserEntity> {
         return userRepository.findUsersByKeyword(keySearch)
     }
 
-    fun upToAdminFollowId(id: Int): UserEntity {
-        if (!userRepository.existsById(id)) {
-            throw UserIsNotExistsException(id)
-        }
-        val userEntity = userRepository.findById(id).toNullable()!!
-        val roleEntity = roleRepository.findByName(Role.ROLE_ADMIN.toString())
-        roleEntity?.let {
-            userEntity.roleEntities = setOf(it)
-        }
+    fun upToHostById(id: Int): UserEntity {
+        val userEntity = userRepository.findById(id).toNullable() ?: throw UserIsNotExistsException(id)
+        val roleEntity = roleRepository.findByName(Role.ROLE_HOST.toString()) ?: throw RoleIsNotExistsException(id)
+        userEntity.roleEntities = userEntity.roleEntities.toMutableSet().apply { add(roleEntity) }
+        userRepository.save(userEntity)
+        return userEntity
+    }
+
+    fun upToAdminById(id: Int): UserEntity {
+        val userEntity = userRepository.findById(id).toNullable() ?: throw UserIsNotExistsException(id)
+        val roleEntity = roleRepository.findByName(Role.ROLE_ADMIN.toString()) ?: throw RoleIsNotExistsException(id)
+        userEntity.roleEntities = userEntity.roleEntities.toMutableSet().apply { add(roleEntity) }
         userRepository.save(userEntity)
         return userEntity
     }

@@ -1,4 +1,4 @@
-package com.ctr.homestaybooking.controller.auth.exception
+package com.ctr.homestaybooking.controller.auth
 
 import com.ctr.homestaybooking.shared.model.ApiError
 import com.ctr.homestaybooking.shared.model.Response

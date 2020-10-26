@@ -1,7 +1,11 @@
 package com.ctr.homestaybooking.config
 
+import com.ctr.homestaybooking.entity.AmenityEntity
+import com.ctr.homestaybooking.entity.PlaceTypeEntity
 import com.ctr.homestaybooking.entity.RoleEntity
 import com.ctr.homestaybooking.entity.UserEntity
+import com.ctr.homestaybooking.repository.AmenityRepository
+import com.ctr.homestaybooking.repository.PlaceTypeRepository
 import com.ctr.homestaybooking.repository.RoleRepository
 import com.ctr.homestaybooking.repository.UserRepository
 import com.ctr.homestaybooking.shared.enums.Gender
@@ -16,20 +20,84 @@ import org.springframework.context.event.ContextRefreshedEvent
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.stereotype.Component
 import java.util.*
+import kotlin.collections.HashSet
 
 @Component
 @Configuration
 class DataSeedingListener(private val userRepository: UserRepository,
-                          private val roleRepository: RoleRepository)
-    : ApplicationListener<ContextRefreshedEvent?> {
+                          private val roleRepository: RoleRepository,
+                          private val amenityRepository: AmenityRepository,
+                          private val placeTypeRepository: PlaceTypeRepository
+) : ApplicationListener<ContextRefreshedEvent?> {
 
     @Value("\${jwt-key}")
     private val signingKey: String? = null
+
+    override fun onApplicationEvent(event: ContextRefreshedEvent) {
+        Role.values().forEach { addRoleIfMissing(it) }
+        addUserIfMissing()
+        amenities.forEach { addAmenityIfMissing(it) }
+        placeTypes.forEach { addPlaceTypeIfMissing(it) }
+
+        if (signingKey == null || signingKey.isEmpty()) {
+            val jws = Jwts.builder()
+                    .setSubject("kunlezIsme")
+                    .signWith(SignatureAlgorithm.HS256, "kunlezIsmeApi").compact()
+            println("Use this jwt key:")
+            println("jwt-key=$jws")
+        }
+    }
+
+    private val amenities = setOf(
+            "Wifi",
+            "Internet",
+            "TV",
+            "Điều hòa",
+            "Quạt",
+            "Máy sấy",
+            "Bình nóng lạnh",
+            "Máy giặt",
+            "Dầu gội, đầu xả",
+            "Giấy vệ sinh",
+            "Khăn tắm",
+            "Kem đánh răng",
+            "Xà phòng tắm",
+            "Interner",
+            "Bếp điện",
+            "Lò vi sóng",
+            "Tủ lạnh",
+            "Ban Công",
+            "Cửa sổ",
+            "Bể bơi cá nhân"
+    )
+
+    private val placeTypes = setOf(
+            "Homestay",
+            "Nhà riêng",
+            "Biệt thự",
+            "Chung cư",
+            "Căn hộ dịch vụ",
+            "Khách sạn căn hộ",
+            "Khu nghỉ dưỡng",
+            "Nhà nghỉ",
+            "Nhà trọ",
+            "Du thuyền"
+    )
+
     private fun addRoleIfMissing(role: Role) {
         if (roleRepository.findByName(role.toString()) == null) {
-            val roleEntity = RoleEntity()
-            roleEntity.name = role.toString()
+            val roleEntity = RoleEntity(name = role.toString())
             roleRepository.save(roleEntity)
+        }
+    }
+
+    private fun addUserIfMissing() {
+        addUserIfMissing("user@gmail.com", "P0p0p0p0", "UUID user", Role.ROLE_USER)
+        addUserIfMissing("admin@gmail.com", "P0p0p0p0", "UUID admin", Role.ROLE_USER, Role.ROLE_ADMIN)
+        addUserIfMissing("host@gmail.com", "P0p0p0p0", "UUID host", Role.ROLE_USER, Role.ROLE_HOST)
+        for (i in 0..14) {
+            val username = "admin$i@gmail.com"
+            addUserIfMissing(username, "P0p0p0p0", "UUID $i", Role.ROLE_ADMIN, Role.ROLE_USER)
         }
     }
 
@@ -54,23 +122,15 @@ class DataSeedingListener(private val userRepository: UserRepository,
         }
     }
 
-    override fun onApplicationEvent(event: ContextRefreshedEvent) {
-        addRoleIfMissing(Role.ROLE_ADMIN)
-        addRoleIfMissing(Role.ROLE_HOST)
-        addRoleIfMissing(Role.ROLE_USER)
-        addUserIfMissing("user@gmail.com", "P0p0p0p0", "UUID user", Role.ROLE_USER)
-        addUserIfMissing("admin@gmail.com", "P0p0p0p0", "UUID admin", Role.ROLE_USER, Role.ROLE_ADMIN)
-        addUserIfMissing("host@gmail.com", "P0p0p0p0", "UUID host", Role.ROLE_USER, Role.ROLE_HOST)
-        for (i in 0..14) {
-            val username = "admin$i@gmail.com"
-            addUserIfMissing(username, "P0p0p0p0", "UUID $i", Role.ROLE_ADMIN, Role.ROLE_USER)
+    private fun addAmenityIfMissing(name: String) {
+        if (amenityRepository.findByName(name) == null) {
+            amenityRepository.save(AmenityEntity(name = name))
         }
-        if (signingKey == null || signingKey.isEmpty()) {
-            val jws = Jwts.builder()
-                    .setSubject("kunlezIsme")
-                    .signWith(SignatureAlgorithm.HS256, "kunlezIsmeApi").compact()
-            println("Use this jwt key:")
-            println("jwt-key=$jws")
+    }
+
+    private fun addPlaceTypeIfMissing(name: String) {
+        if (placeTypeRepository.findByName(name) == null) {
+            placeTypeRepository.save(PlaceTypeEntity(name = name, description = ""))
         }
     }
 }

@@ -4,7 +4,6 @@ import com.ctr.homestaybooking.config.TokenProvider
 import com.ctr.homestaybooking.controller.auth.dto.AuthTokenDTO
 import com.ctr.homestaybooking.controller.auth.dto.LoginDTO
 import com.ctr.homestaybooking.controller.auth.dto.RegisterDTO
-import com.ctr.homestaybooking.controller.auth.exception.PasswordLoginFailedException
 import com.ctr.homestaybooking.service.AuthService
 import com.ctr.homestaybooking.service.UserService
 import org.springframework.http.HttpStatus
@@ -26,7 +25,7 @@ class AuthenticationController(private val authenticationManager: Authentication
     @PostMapping("/register")
     @ResponseStatus(value = HttpStatus.CREATED)
     fun register(@RequestBody @Validated registerDTO: RegisterDTO): ResponseEntity<AuthTokenDTO> {
-        userService.addNewUser(registerDTO.toUserEntity()).toUserDto().apply {
+        userService.addUser(registerDTO.toUserEntity()).toUserDto().apply {
             val authentication = authenticationManager.authenticate(
                     UsernamePasswordAuthenticationToken(
                             registerDTO.email,
@@ -61,7 +60,7 @@ class AuthenticationController(private val authenticationManager: Authentication
     }
 
     @PostMapping("/autoLogin")
-    fun login(@RequestBody @Validated token: String): ResponseEntity<AuthTokenDTO> {
+    fun autoLogin(@RequestBody @Validated token: String): ResponseEntity<AuthTokenDTO> {
         val email = jwtTokenUtil.getUsernameFromToken(token)
         val password = ""
         if (authenticationService.isHandleEmail(email) &&

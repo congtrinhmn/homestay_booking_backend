@@ -26,8 +26,6 @@ data class RegisterDTO(
         @field: NotBlank(message = NOT_BLANK_DEVICE_TOKEN)
         val deviceToken: String,
 
-        val roleEntities: Set<RoleEntity>,
-
         @field: NotBlank(message = NOT_BLANK_FIRST_NAME)
         val firstName: String,
 
@@ -46,7 +44,7 @@ data class RegisterDTO(
         @field: Pattern(regexp = PATTERN_PHONE_NUMBER, message = ERROR_PHONE_NUMBER)
         val phone_number: String
 ) {
-        fun toUserEntity(): UserEntity {
-                return UserEntity(0, email, uuid, deviceToken, password, roleEntities, firstName, lastName, gender, birthday, phone_number)
-        }
+    fun toUserEntity(): UserEntity {
+        return UserEntity(0, email, uuid, deviceToken, password, setOf(RoleEntity(1, ROLE_USER)), firstName, lastName, gender, birthday, phone_number)
+    }
 }
