@@ -1,6 +1,7 @@
 package com.ctr.homestaybooking.entity
 
 import com.ctr.homestaybooking.shared.FORMAT_DATE
+import com.ctr.homestaybooking.shared.enums.DateStatus
 import org.springframework.format.annotation.DateTimeFormat
 import java.util.*
 import javax.persistence.*
@@ -22,5 +23,10 @@ data class BookingSlotEntity(
         var date: Date,
 
         @NotNull
-        var isAvailable: Boolean = true
-)
+        @Enumerated(EnumType.STRING)
+        var status: DateStatus = DateStatus.UNAVAILABLE
+) {
+        fun toBookingSlotDto() = BookingSlotDto(date, status)
+}
+
+data class BookingSlotDto(var date: Date, var status: DateStatus)

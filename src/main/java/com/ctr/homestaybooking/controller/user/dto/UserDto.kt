@@ -26,6 +26,8 @@ data class UserDto(
 
         val roleEntities: Set<RoleEntity>,
 
+        val image: String,
+
         @field: NotBlank(message = NOT_BLANK_FIRST_NAME)
         val firstName: String,
 
@@ -41,7 +43,7 @@ data class UserDto(
 
         @field: NotBlank(message = NOT_BLANK_PHONE_NUMBER)
         @field: Pattern(regexp = "(0)+([0-9]{9})\\b", message = "Phone not in correct format")
-        val phone_number: String,
+        val phoneNumber: String,
 
         @field: Enumerated(EnumType.STRING)
         val status: UserStatus = UserStatus.ACTIVE

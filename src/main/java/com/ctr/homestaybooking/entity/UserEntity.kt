@@ -38,6 +38,9 @@ data class UserEntity(
                 inverseJoinColumns = [JoinColumn(name = "role_id")])
         var roleEntities: Set<RoleEntity>,
 
+        @OneToOne
+        var imageEntity: ImageEntity,
+
         @NotBlank
         var firstName: String,
 
@@ -53,12 +56,12 @@ data class UserEntity(
         var birthday: Date,
 
         @NotBlank
-        var phone_number: String,
+        var phoneNumber: String,
 
         @Enumerated(EnumType.STRING)
         var status: UserStatus = UserStatus.ACTIVE
 ) {
     fun toUserDto(): UserDto {
-        return UserDto(id, email, uuid, deviceToken, roleEntities, firstName, lastName, gender, birthday, phone_number)
+            return UserDto(id, email, uuid, deviceToken, roleEntities, imageEntity.url, firstName, lastName, gender, birthday, phoneNumber)
     }
 }

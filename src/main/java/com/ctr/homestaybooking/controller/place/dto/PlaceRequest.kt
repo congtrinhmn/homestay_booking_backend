@@ -1,5 +1,6 @@
 package com.ctr.homestaybooking.controller.place.dto
 
+import com.ctr.homestaybooking.entity.BookingSlotDto
 import com.ctr.homestaybooking.entity.BookingSlotEntity
 import com.ctr.homestaybooking.entity.ImageEntity
 import com.ctr.homestaybooking.entity.PlaceEntity
@@ -37,26 +38,26 @@ data class PlaceRequest(
 
         var address: String?,
 
-        var guest_count: Int?,
+        var guestCount: Int?,
 
-        var room_count: Int?,
+        var roomCount: Int?,
 
-        var bed_count: Int?,
+        var bedCount: Int?,
 
-        var bathroom_count: Int?,
+        var bathroomCount: Int?,
 
         var size: Int?,
 
-        var price_per_day: Double?,
+        var pricePerDay: Double?,
 
         @Enumerated(EnumType.STRING)
-        var refund_type: RefundType?,
+        var refundType: RefundType?,
 
-        var earliest_check_in_time: Date?,
+        var earliestCheckInTime: Date?,
 
-        var latest_check_in_time: Date?,
+        var latestCheckInTime: Date?,
 
-        var check_out_time: Date?,
+        var checkOutTime: Date?,
 
         @Enumerated(EnumType.STRING)
         var status: PlaceStatus = PlaceStatus.CREATING,
@@ -65,7 +66,7 @@ data class PlaceRequest(
 
         var amenities: List<Int>?,
 
-        var bookingSlots: Set<Date>?,
+        var bookingSlots: Set<BookingSlotDto>?,
 
         @NotNull
         var userId: Int,
@@ -89,20 +90,20 @@ data class PlaceRequest(
             latitude,
             street,
             address,
-            guest_count,
-            room_count,
-            bed_count,
-            bathroom_count,
+            guestCount,
+            roomCount,
+            bedCount,
+            bathroomCount,
             size,
-            price_per_day,
-            refund_type,
-            earliest_check_in_time,
-            latest_check_in_time,
-            check_out_time,
+            pricePerDay,
+            refundType,
+            earliestCheckInTime,
+            latestCheckInTime,
+            checkOutTime,
             status,
             images?.map { ImageEntity(url = it) }?.toSet(),
             amenities?.map { amenityService.getAmenityById(it) }?.toSet(),
-            bookingSlots?.map { BookingSlotEntity(0, it) }?.toSet(),
+            bookingSlots?.map { BookingSlotEntity(0, it.date, it.status) }?.toSet(),
             userService.getUserById(userId),
             wardId?.let { locationService.getWardById(it) },
             placeTypeId?.let { placeTypeService.getPlaceTypeById(it) }

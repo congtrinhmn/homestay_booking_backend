@@ -36,32 +36,32 @@ data class PlaceEntity(
 
         var address: String?,
 
-        var guest_count: Int?,
+        var guestCount: Int?,
 
-        var room_count: Int?,
+        var roomCount: Int?,
 
-        var bed_count: Int?,
+        var bedCount: Int?,
 
-        var bathroom_count: Int?,
+        var bathroomCount: Int?,
 
         var size: Int?,
 
-        var price_per_day: Double?,
+        var pricePerDay: Double?,
 
         @Enumerated(EnumType.STRING)
-        var refund_type: RefundType?,
+        var refundType: RefundType?,
 
         @Temporal(TemporalType.TIME)
         @DateTimeFormat(pattern = FORMAT_TIME)
-        var earliest_check_in_time: Date?,
+        var earliestCheckInTime: Date?,
 
         @Temporal(TemporalType.TIME)
         @DateTimeFormat(pattern = FORMAT_TIME)
-        var latest_check_in_time: Date?,
+        var latestCheckInTime: Date?,
 
         @Temporal(TemporalType.TIME)
         @DateTimeFormat(pattern = FORMAT_TIME)
-        var check_out_time: Date?,
+        var checkOutTime: Date?,
 
         @Enumerated(EnumType.STRING)
         var status: PlaceStatus = PlaceStatus.CREATING,
@@ -99,12 +99,12 @@ data class PlaceEntity(
                 bookingType,
                 street,
                 address,
-                guest_count,
-                room_count,
-                bed_count,
-                bathroom_count,
+                guestCount,
+                roomCount,
+                bedCount,
+                bathroomCount,
                 size,
-                price_per_day,
+                pricePerDay,
                 imageEntities?.map { it.url }?.toSet()
         )
 
@@ -115,12 +115,12 @@ data class PlaceEntity(
                 bookingType,
                 street,
                 address,
-                guest_count,
-                room_count,
-                bed_count,
-                bathroom_count,
+                guestCount,
+                roomCount,
+                bedCount,
+                bathroomCount,
                 size,
-                price_per_day,
+                pricePerDay,
                 imageEntities?.map { it.url }?.toSet(),
                 amenityEntities,
                 bookingSlotEntities

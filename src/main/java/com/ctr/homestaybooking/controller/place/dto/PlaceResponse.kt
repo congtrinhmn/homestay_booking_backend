@@ -20,17 +20,17 @@ data class PlaceResponse(
 
         var address: String?,
 
-        var guest_count: Int?,
+        var guestCount: Int?,
 
-        var room_count: Int?,
+        var roomCount: Int?,
 
-        var bed_count: Int?,
+        var bedCount: Int?,
 
-        var bathroom_count: Int?,
+        var bathroomCount: Int?,
 
         var size: Int?,
 
-        var price_per_day: Double?,
+        var pricePerDay: Double?,
 
         var images: Set<String>?
 )
