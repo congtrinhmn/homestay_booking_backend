@@ -8,7 +8,7 @@ import javax.validation.constraints.NotNull
  */
 @Entity
 @Table(name = "districts")
-data class DistrictEntity(
+class DistrictEntity(
         @Id
         @GeneratedValue(strategy = GenerationType.IDENTITY)
         var id: Int = 0,
@@ -20,13 +20,17 @@ data class DistrictEntity(
         var name: String,
 
         @OneToMany(mappedBy = "districtEntity")
-        var wardEntities: List<WardEntity>,
+        var wardEntities: List<WardEntity>? = null,
 
         @ManyToOne(fetch = FetchType.LAZY)
         @JoinColumn(name = "province_id")
-        var provinceEntity: ProvinceEntity
+        var provinceEntity: ProvinceEntity? = null
 ) {
-        fun toDistrictDto() = DistrictDto(id, type, name, wardEntities.map { it.toWardDto() })
+    fun toDistrictResponse() = DistrictResponse(id, type, name, wardEntities?.map { it.toWardResponse() })
+
+    fun toDistrictDetailResponse() = DistrictDetailResponse(id, type, name, provinceEntity?.toProvinceResponse())
 }
 
-data class DistrictDto(var id: Int = 0, var type: String, var name: String, val wards: List<WardDto>)
+data class DistrictResponse(var id: Int = 0, var type: String, var name: String, val wards: List<WardResponse>?)
+
+data class DistrictDetailResponse(var id: Int = 0, var type: String, var name: String, val provinceResponse: ProvinceResponse?)

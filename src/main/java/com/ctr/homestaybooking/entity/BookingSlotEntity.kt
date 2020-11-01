@@ -12,7 +12,7 @@ import javax.validation.constraints.NotNull
  */
 @Entity
 @Table(name = "booking_slots")
-data class BookingSlotEntity(
+class BookingSlotEntity(
         @Id
         @GeneratedValue(strategy = GenerationType.IDENTITY)
         var id: Int = 0,
@@ -26,7 +26,7 @@ data class BookingSlotEntity(
         @Enumerated(EnumType.STRING)
         var status: DateStatus = DateStatus.UNAVAILABLE
 ) {
-        fun toBookingSlotDto() = BookingSlotDto(date, status)
+    fun toBookingSlotDto() = BookingSlotDto(date, status)
 }
 
 data class BookingSlotDto(var date: Date, var status: DateStatus)

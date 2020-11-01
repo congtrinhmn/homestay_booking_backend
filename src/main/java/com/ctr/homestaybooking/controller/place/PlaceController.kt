@@ -57,16 +57,4 @@ class PlaceController(private val placeService: PlaceService,
     fun deletePlace(@PathVariable("id") id: Int) {
         placeService.deletePlaceByID(id)
     }
-
-    /*@Secured("ROLE_ADMIN")
-    @PatchMapping("/{id}/status")
-    fun changeStatus(@PathVariable("id") id: Int): ApiData<UserDTO> {
-        return ApiData(placeService.reverseStatusUserFollowId(id).toUserDto())
-    }*/
-
-    /*@Secured("ROLE_ADMIN")
-    @GetMapping("/search")
-    fun searchUsers(@RequestParam(name = "valueSearch") valueSearch: String): ApiData<List<UserDTO>> {
-        return ApiData(placeService.searchUsers(valueSearch).map { it.toUserDto() })
-    }*/
 }

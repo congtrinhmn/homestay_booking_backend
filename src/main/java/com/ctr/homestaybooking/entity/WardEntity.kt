@@ -8,7 +8,7 @@ import javax.validation.constraints.NotNull
  */
 @Entity
 @Table(name = "wards")
-data class WardEntity(
+class WardEntity(
         @Id
         @GeneratedValue(strategy = GenerationType.IDENTITY)
         var id: Int = 0,
@@ -27,7 +27,12 @@ data class WardEntity(
         var districtEntity: DistrictEntity? = null
 
 ) {
-        fun toWardDto() = WardDto(id, type, name)
+    fun toWardResponse() = WardResponse(id, type, name)
+
+    fun toWardDetailResponse() = WardDetailResponse(id, type, name, districtEntity?.toDistrictDetailResponse())
 }
 
-data class WardDto(var id: Int = 0, var type: String, var name: String)
+data class WardResponse(var id: Int = 0, var type: String, var name: String)
+
+data class WardDetailResponse(var id: Int = 0, var type: String, var name: String, var districtDetailResponse: DistrictDetailResponse?)
+
