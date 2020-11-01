@@ -4,25 +4,27 @@ import com.ctr.homestaybooking.controller.place.dto.PlaceDetailResponse
 import com.ctr.homestaybooking.controller.place.dto.PlaceResponse
 import com.ctr.homestaybooking.shared.FORMAT_TIME
 import com.ctr.homestaybooking.shared.enums.BookingType
+import com.ctr.homestaybooking.shared.enums.CancelType
 import com.ctr.homestaybooking.shared.enums.PlaceStatus
-import com.ctr.homestaybooking.shared.enums.RefundType
+import com.ctr.homestaybooking.shared.enums.SubmitStatus
 import org.springframework.format.annotation.DateTimeFormat
 import java.util.*
 import javax.persistence.*
 import javax.validation.constraints.NotNull
+
 
 /**
  * Created by at-trinhnguyen2 on 2020/10/16
  */
 @Entity
 @Table(name = "places")
-data class PlaceEntity(
+class PlaceEntity(
         @Id
         @GeneratedValue(strategy = GenerationType.IDENTITY)
         var id: Int = 0,
 
         @NotNull
-        var name: String,
+        var name: String?,
 
         var description: String?,
 
@@ -36,35 +38,38 @@ data class PlaceEntity(
 
         var address: String?,
 
-        var guest_count: Int?,
+        var guestCount: Int?,
 
-        var room_count: Int?,
+        var roomCount: Int?,
 
-        var bed_count: Int?,
+        var bedCount: Int?,
 
-        var bathroom_count: Int?,
+        var bathroomCount: Int?,
 
         var size: Int?,
 
-        var price_per_day: Double?,
+        var pricePerDay: Double?,
 
         @Enumerated(EnumType.STRING)
-        var refund_type: RefundType?,
+        var cancelType: CancelType?,
 
         @Temporal(TemporalType.TIME)
         @DateTimeFormat(pattern = FORMAT_TIME)
-        var earliest_check_in_time: Date?,
+        var earliestCheckInTime: Date?,
 
         @Temporal(TemporalType.TIME)
         @DateTimeFormat(pattern = FORMAT_TIME)
-        var latest_check_in_time: Date?,
+        var latestCheckInTime: Date?,
 
         @Temporal(TemporalType.TIME)
         @DateTimeFormat(pattern = FORMAT_TIME)
-        var check_out_time: Date?,
+        var checkOutTime: Date?,
 
         @Enumerated(EnumType.STRING)
-        var status: PlaceStatus = PlaceStatus.CREATING,
+        var submitStatus: SubmitStatus = SubmitStatus.DRAFT,
+
+        @Enumerated(EnumType.STRING)
+        var status: PlaceStatus = PlaceStatus.UNLISTED,
 
         @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true)
         var imageEntities: Set<ImageEntity>?,
@@ -90,39 +95,60 @@ data class PlaceEntity(
 
         @ManyToOne
         @JoinColumn(name = "place_type_id")
-        var placeTypeEntity: PlaceTypeEntity?
-) {
-        fun toPlaceResponse() = PlaceResponse(
-                id,
-                name,
-                description,
-                bookingType,
-                street,
-                address,
-                guest_count,
-                room_count,
-                bed_count,
-                bathroom_count,
-                size,
-                price_per_day,
-                imageEntities?.map { it.url }?.toSet()
-        )
+        var placeTypeEntity: PlaceTypeEntity?,
 
-        fun toPlaceDetailResponse() = PlaceDetailResponse(
-                id,
-                name,
-                description,
-                bookingType,
-                street,
-                address,
-                guest_count,
-                room_count,
-                bed_count,
-                bathroom_count,
-                size,
-                price_per_day,
-                imageEntities?.map { it.url }?.toSet(),
-                amenityEntities,
-                bookingSlotEntities
-        )
+        @ManyToMany(mappedBy = "placeEntities")
+        var promoEntities: Set<PromoEntity>?
+) {
+    @PreRemove
+    private fun removePlaceFromPromo() {
+        promoEntities?.forEach {
+            it.placeEntities.remove(this)
+        }
+    }
+
+    fun toPlaceResponse() = PlaceResponse(
+            id = id,
+            name = name,
+            description = description,
+            bookingType = bookingType,
+            street = street,
+            address = address,
+            guestCount = guestCount,
+            roomCount = roomCount,
+            bedCount = bedCount,
+            bathroomCount = bathroomCount,
+            size = size,
+            pricePerDay = pricePerDay,
+            images = imageEntities?.map { it.url }?.toSet()
+    )
+
+    fun toPlaceDetailResponse() = PlaceDetailResponse(
+            id = id,
+            name = name,
+            description = description,
+            bookingType = bookingType,
+            latitude = latitude,
+            longitude = longitude,
+            street = street,
+            address = address,
+            guestCount = guestCount,
+            roomCount = roomCount,
+            bedCount = bedCount,
+            bathroomCount = bathroomCount,
+            size = size,
+            pricePerDay = pricePerDay,
+            cancelType = cancelType,
+            earliestCheckInTime = earliestCheckInTime,
+            latestCheckInTime = latestCheckInTime,
+            checkOutTime = checkOutTime,
+            submitStatus = submitStatus,
+            images = imageEntities?.map { it.url }?.toSet(),
+            amenities = amenityEntities,
+            bookingSlots = bookingSlotEntities,
+            hostDetail = userEntity?.toUserDetailResponse(),
+            wardDetailResponse = wardEntity?.toWardDetailResponse(),
+            placeTypeId = placeTypeEntity?.id,
+            promos = promoEntities?.map { it.toPromoResponse() }?.toSet()
+    )
 }

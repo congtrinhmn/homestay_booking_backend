@@ -3,7 +3,7 @@ package com.ctr.homestaybooking.controller.auth
 import com.ctr.homestaybooking.config.TokenProvider
 import com.ctr.homestaybooking.controller.auth.dto.AuthTokenDTO
 import com.ctr.homestaybooking.controller.auth.dto.LoginDTO
-import com.ctr.homestaybooking.controller.auth.dto.RegisterDTO
+import com.ctr.homestaybooking.controller.auth.dto.UserRequest
 import com.ctr.homestaybooking.service.AuthService
 import com.ctr.homestaybooking.service.UserService
 import org.springframework.http.HttpStatus
@@ -24,12 +24,12 @@ class AuthenticationController(private val authenticationManager: Authentication
 
     @PostMapping("/register")
     @ResponseStatus(value = HttpStatus.CREATED)
-    fun register(@RequestBody @Validated registerDTO: RegisterDTO): ResponseEntity<AuthTokenDTO> {
-        userService.addUser(registerDTO.toUserEntity()).toUserDto().apply {
+    fun register(@RequestBody @Validated userRequest: UserRequest): ResponseEntity<AuthTokenDTO> {
+        userService.addUser(userRequest.toUserEntity()).toUserDetailResponse().apply {
             val authentication = authenticationManager.authenticate(
                     UsernamePasswordAuthenticationToken(
-                            registerDTO.email,
-                            registerDTO.password
+                            userRequest.email,
+                            userRequest.password
                     )
             )
             SecurityContextHolder.getContext().authentication = authentication
@@ -51,7 +51,7 @@ class AuthenticationController(private val authenticationManager: Authentication
                 )
                 SecurityContextHolder.getContext().authentication = authentication
                 val token = jwtTokenUtil.generateToken(authentication)
-                ResponseEntity.ok(AuthTokenDTO(userService.getUserByEmail(login.email).toUserDto(), token))
+                ResponseEntity.ok(AuthTokenDTO(userService.getUserByEmail(login.email).toUserDetailResponse(), token))
             } catch (e: Exception) {
                 throw PasswordLoginFailedException()
             }
@@ -73,7 +73,7 @@ class AuthenticationController(private val authenticationManager: Authentication
                         )
                 )
                 SecurityContextHolder.getContext().authentication = authentication
-                ResponseEntity.ok(AuthTokenDTO(userService.getUserByEmail(email).toUserDto(), token))
+                ResponseEntity.ok(AuthTokenDTO(userService.getUserByEmail(email).toUserDetailResponse(), token))
             } catch (e: Exception) {
                 throw PasswordLoginFailedException()
             }

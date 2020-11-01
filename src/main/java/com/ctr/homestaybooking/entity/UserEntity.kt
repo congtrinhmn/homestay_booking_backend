@@ -1,6 +1,6 @@
 package com.ctr.homestaybooking.entity
 
-import com.ctr.homestaybooking.controller.user.dto.UserDto
+import com.ctr.homestaybooking.controller.user.dto.UserDetailResponse
 import com.ctr.homestaybooking.shared.FORMAT_DATE
 import com.ctr.homestaybooking.shared.enums.Gender
 import com.ctr.homestaybooking.shared.enums.UserStatus
@@ -14,7 +14,7 @@ import javax.validation.constraints.NotBlank
  */
 @Entity
 @Table(name = "users")
-data class UserEntity(
+class UserEntity(
         @Id
         @GeneratedValue(strategy = GenerationType.IDENTITY)
         var id: Int = 0,
@@ -38,6 +38,10 @@ data class UserEntity(
                 inverseJoinColumns = [JoinColumn(name = "role_id")])
         var roleEntities: Set<RoleEntity>,
 
+        @OneToOne(cascade = [CascadeType.ALL], orphanRemoval = true)
+        @JoinColumn(name = "image_id")
+        var imageEntity: ImageEntity,
+
         @NotBlank
         var firstName: String,
 
@@ -53,12 +57,13 @@ data class UserEntity(
         var birthday: Date,
 
         @NotBlank
-        var phone_number: String,
+        var phoneNumber: String,
 
         @Enumerated(EnumType.STRING)
         var status: UserStatus = UserStatus.ACTIVE
 ) {
-    fun toUserDto(): UserDto {
-        return UserDto(id, email, uuid, deviceToken, roleEntities, firstName, lastName, gender, birthday, phone_number)
+    fun toUserDetailResponse(): UserDetailResponse {
+        return UserDetailResponse(id, email, uuid, deviceToken, roleEntities, imageEntity.url, firstName, lastName, gender, birthday, phoneNumber)
     }
 }
+

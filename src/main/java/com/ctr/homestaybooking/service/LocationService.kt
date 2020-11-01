@@ -22,10 +22,11 @@ class LocationService(private val provinceRepository: ProvinceRepository,
     fun getProvinceById(id: Int): ProvinceEntity = provinceRepository.getOne(id)
 
     fun getDistrictsByProvinceId(id: Int): List<DistrictEntity> = provinceRepository.getOne(id).districtEntities
+            ?: listOf()
 
     fun getDistrictById(id: Int): DistrictEntity = districtRepository.getOne(id)
 
-    fun getWardsByDistrictId(id: Int): List<WardEntity> = getDistrictById(id).wardEntities
+    fun getWardsByDistrictId(id: Int): List<WardEntity> = getDistrictById(id).wardEntities ?: listOf()
 
     fun getWardById(id: Int): WardEntity = wardRepository.getOne(id)
 }

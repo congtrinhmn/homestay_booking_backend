@@ -1,13 +1,7 @@
 package com.ctr.homestaybooking.config
 
-import com.ctr.homestaybooking.entity.AmenityEntity
-import com.ctr.homestaybooking.entity.PlaceTypeEntity
-import com.ctr.homestaybooking.entity.RoleEntity
-import com.ctr.homestaybooking.entity.UserEntity
-import com.ctr.homestaybooking.repository.AmenityRepository
-import com.ctr.homestaybooking.repository.PlaceTypeRepository
-import com.ctr.homestaybooking.repository.RoleRepository
-import com.ctr.homestaybooking.repository.UserRepository
+import com.ctr.homestaybooking.entity.*
+import com.ctr.homestaybooking.repository.*
 import com.ctr.homestaybooking.shared.enums.Gender
 import com.ctr.homestaybooking.shared.enums.Role
 import com.ctr.homestaybooking.shared.enums.UserStatus
@@ -27,7 +21,10 @@ import kotlin.collections.HashSet
 class DataSeedingListener(private val userRepository: UserRepository,
                           private val roleRepository: RoleRepository,
                           private val amenityRepository: AmenityRepository,
-                          private val placeTypeRepository: PlaceTypeRepository
+                          private val placeTypeRepository: PlaceTypeRepository,
+                          private val provinceRepository: ProvinceRepository,
+                          private val districtRepository: DistrictRepository,
+                          private val wardRepository: WardRepository
 ) : ApplicationListener<ContextRefreshedEvent?> {
 
     @Value("\${jwt-key}")
@@ -36,6 +33,7 @@ class DataSeedingListener(private val userRepository: UserRepository,
     override fun onApplicationEvent(event: ContextRefreshedEvent) {
         Role.values().forEach { addRoleIfMissing(it) }
         addUserIfMissing()
+        addProvinceIfMissing()
         amenities.forEach { addAmenityIfMissing(it) }
         placeTypes.forEach { addPlaceTypeIfMissing(it) }
 
@@ -111,9 +109,10 @@ class DataSeedingListener(private val userRepository: UserRepository,
                     email = username,
                     password = BCryptPasswordEncoder().encode(password),
                     roleEntities = roleIsExists, firstName = "Trinh",
+                    imageEntity = ImageEntity(url = "https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png"),
                     lastName = "Nguyen",
                     birthday = Date(),
-                    phone_number = "0123456789",
+                    phoneNumber = "0123456789",
                     status = UserStatus.ACTIVE,
                     uuid = uuid,
                     deviceToken = uuid,
@@ -131,6 +130,27 @@ class DataSeedingListener(private val userRepository: UserRepository,
     private fun addPlaceTypeIfMissing(name: String) {
         if (placeTypeRepository.findByName(name) == null) {
             placeTypeRepository.save(PlaceTypeEntity(name = name, description = ""))
+        }
+    }
+
+    private fun addProvinceIfMissing() {
+        if (provinceRepository.findByName("Thành phố Hà Nội") == null) {
+            val provinceEntity = provinceRepository.save(ProvinceEntity(1, "Thành phố Trung ương", "Thành phố Hà Nội", null))
+            val districtEntity = districtRepository.save((DistrictEntity(1, "Quận", "Quận Ba Đình", null, provinceEntity)))
+            wardRepository.save(WardEntity(1, "Phường", "Phường Phúc Xá", districtEntity))
+            wardRepository.save(WardEntity(4, "Phường", "Phường Trúc Bạch", districtEntity))
+        }
+    }
+
+    private fun addWardIfMissing() {
+        if (wardRepository.findByName("Phường Phúc Xá") == null) {
+            wardRepository.save(
+                    WardEntity(1, "Phường", "Phường Phúc Xá",
+                            DistrictEntity(1, "Quận", "Quận Ba Đình", null,
+                                    ProvinceEntity(1, "Thành phố Trung ương", "Thành phố Hà Nội", null
+                                    ))
+                    )
+            )
         }
     }
 }

@@ -8,7 +8,7 @@ import javax.validation.constraints.NotNull
  */
 @Entity
 @Table(name = "images")
-data class ImageEntity(
+class ImageEntity(
         @Id
         @GeneratedValue(strategy = GenerationType.IDENTITY)
         var id: Int = 0,

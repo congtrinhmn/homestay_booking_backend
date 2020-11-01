@@ -1,8 +1,15 @@
 package com.ctr.homestaybooking.controller.place.dto
 
+import com.ctr.homestaybooking.controller.user.dto.UserDetailResponse
 import com.ctr.homestaybooking.entity.AmenityEntity
 import com.ctr.homestaybooking.entity.BookingSlotEntity
+import com.ctr.homestaybooking.entity.PromoResponse
+import com.ctr.homestaybooking.entity.WardDetailResponse
 import com.ctr.homestaybooking.shared.enums.BookingType
+import com.ctr.homestaybooking.shared.enums.CancelType
+import com.ctr.homestaybooking.shared.enums.PlaceStatus
+import com.ctr.homestaybooking.shared.enums.SubmitStatus
+import java.util.*
 
 /**
  * Created by at-trinhnguyen2 on 2020/10/26
@@ -18,25 +25,49 @@ data class PlaceDetailResponse(
 
         var bookingType: BookingType?,
 
+        var longitude: String?,
+
+        var latitude: String?,
+
         var street: String?,
 
         var address: String?,
 
-        var guest_count: Int?,
+        var guestCount: Int?,
 
-        var room_count: Int?,
+        var roomCount: Int?,
 
-        var bed_count: Int?,
+        var bedCount: Int?,
 
-        var bathroom_count: Int?,
+        var bathroomCount: Int?,
 
         var size: Int?,
 
-        var price_per_day: Double?,
+        var pricePerDay: Double?,
+
+        var cancelType: CancelType?,
+
+        var earliestCheckInTime: Date?,
+
+        var latestCheckInTime: Date?,
+
+        var checkOutTime: Date?,
+
+        var submitStatus: SubmitStatus = SubmitStatus.DRAFT,
+
+        var status: PlaceStatus = PlaceStatus.UNLISTED,
 
         var images: Set<String>?,
 
-        var amenityEntity: Set<AmenityEntity>?,
+        var amenities: Set<AmenityEntity>?,
 
-        var bookingSlots: Set<BookingSlotEntity>?
+        var bookingSlots: Set<BookingSlotEntity>?,
+
+        var hostDetail: UserDetailResponse?,
+
+        var wardDetailResponse: WardDetailResponse?,
+
+        var placeTypeId: Int?,
+
+        var promos: Set<PromoResponse>?
 )

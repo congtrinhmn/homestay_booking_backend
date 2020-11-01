@@ -22,6 +22,9 @@ class PlaceService(private val placeRepository: PlaceRepository,
     fun getPlaceByID(id: Int): PlaceEntity =
             placeRepository.findById(id).toNullable() ?: throw  PlaceNotFoundException(id)
 
+    fun getPlacesByIDs(ids: Set<Int>) =
+            placeRepository.findAllById(ids).filterIsInstance<PlaceEntity>().toSet()
+
     fun getPlacesByWardEntity(wardEntity: WardEntity): Set<PlaceEntity> =
             placeRepository.findByWardEntity(wardEntity) ?: throw  NotFoundException("Ward", wardEntity.id)
 

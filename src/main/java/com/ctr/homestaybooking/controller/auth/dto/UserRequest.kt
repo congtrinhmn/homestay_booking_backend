@@ -1,5 +1,6 @@
 package com.ctr.homestaybooking.controller.auth.dto
 
+import com.ctr.homestaybooking.entity.ImageEntity
 import com.ctr.homestaybooking.entity.RoleEntity
 import com.ctr.homestaybooking.entity.UserEntity
 import com.ctr.homestaybooking.shared.*
@@ -11,7 +12,7 @@ import javax.persistence.Enumerated
 import javax.validation.constraints.NotBlank
 import javax.validation.constraints.Pattern
 
-data class RegisterDTO(
+data class UserRequest(
         @field: NotBlank(message = NOT_BLANK_EMAIL)
         @field: Pattern(regexp = PATTERN_EMAIL, message = ERROR_EMAIL)
         val email: String,
@@ -25,6 +26,8 @@ data class RegisterDTO(
 
         @field: NotBlank(message = NOT_BLANK_DEVICE_TOKEN)
         val deviceToken: String,
+
+        val image: String,
 
         @field: NotBlank(message = NOT_BLANK_FIRST_NAME)
         val firstName: String,
@@ -42,9 +45,9 @@ data class RegisterDTO(
 
         @field: NotBlank(message = NOT_BLANK_PHONE_NUMBER)
         @field: Pattern(regexp = PATTERN_PHONE_NUMBER, message = ERROR_PHONE_NUMBER)
-        val phone_number: String
+        val phoneNumber: String
 ) {
     fun toUserEntity(): UserEntity {
-        return UserEntity(0, email, uuid, deviceToken, password, setOf(RoleEntity(1, ROLE_USER)), firstName, lastName, gender, birthday, phone_number)
+        return UserEntity(0, email, uuid, deviceToken, password, setOf(RoleEntity(1, ROLE_USER)), ImageEntity(url = image), firstName, lastName, gender, birthday, phoneNumber)
     }
 }

@@ -8,7 +8,7 @@ import javax.validation.constraints.NotNull
  */
 @Entity
 @Table(name = "amenities")
-data class AmenityEntity(
+class AmenityEntity(
         @Id
         @GeneratedValue(strategy = GenerationType.IDENTITY)
         var id: Int = 0,
