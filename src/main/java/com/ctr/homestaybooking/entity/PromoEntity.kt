@@ -8,6 +8,7 @@ import java.util.*
 import javax.persistence.*
 import javax.validation.constraints.NotNull
 
+
 /**
  * Created by at-trinhnguyen2 on 2020/10/29
  */
@@ -45,7 +46,7 @@ class PromoEntity(
         @JoinTable(name = "promo_place",
                 joinColumns = [JoinColumn(name = "promo_id")],
                 inverseJoinColumns = [JoinColumn(name = "place_id")])
-        var placeEntities: Set<PlaceEntity>
+        var placeEntities: MutableSet<PlaceEntity>
 ) {
 
     fun toPromoResponse() = PromoResponse(
@@ -115,6 +116,6 @@ data class PromoRequest(
             endDate = endDate,
             discount = discount,
             discountPercent = discountPercent,
-            placeEntities = placeService.getPlacesByIDs(placeIDs)
+            placeEntities = placeService.getPlacesByIDs(placeIDs).toMutableSet()
     )
 }

@@ -12,6 +12,7 @@ import java.util.*
 import javax.persistence.*
 import javax.validation.constraints.NotNull
 
+
 /**
  * Created by at-trinhnguyen2 on 2020/10/16
  */
@@ -99,6 +100,12 @@ class PlaceEntity(
         @ManyToMany(mappedBy = "placeEntities")
         var promoEntities: Set<PromoEntity>?
 ) {
+    @PreRemove
+    private fun removePlaceFromPromo() {
+        promoEntities?.forEach {
+            it.placeEntities.remove(this)
+        }
+    }
 
     fun toPlaceResponse() = PlaceResponse(
             id = id,
