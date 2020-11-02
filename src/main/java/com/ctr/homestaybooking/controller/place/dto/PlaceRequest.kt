@@ -108,7 +108,8 @@ data class PlaceRequest(
             status = status,
             imageEntities = images?.map { ImageEntity(url = it) }?.toSet(),
             amenityEntities = amenities?.map { amenityService.getAmenityById(it) }?.toSet(),
-            bookingSlotEntities = bookingSlots?.map { BookingSlotEntity(0, it.date, it.status) }?.toSet(),
+            bookingSlotEntities = bookingSlots?.map { BookingSlotEntity(0, it.date, it.status) }?.toMutableSet()
+                    ?: mutableSetOf(),
             userEntity = userService.getUserById(userId),
             wardEntity = wardId?.let { locationService.getWardById(it) },
             placeTypeEntity = placeTypeId?.let { placeTypeService.getPlaceTypeById(it) },

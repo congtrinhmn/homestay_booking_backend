@@ -1,10 +1,10 @@
 package com.ctr.homestaybooking.controller.booking
 
 import com.ctr.homestaybooking.entity.BookingDetailResponse
-import com.ctr.homestaybooking.entity.BookingEntity
 import com.ctr.homestaybooking.entity.BookingRequest
 import com.ctr.homestaybooking.service.BookingService
 import com.ctr.homestaybooking.service.PlaceService
+import com.ctr.homestaybooking.service.PromoService
 import com.ctr.homestaybooking.service.UserService
 import com.ctr.homestaybooking.shared.ROLE_ADMIN
 import com.ctr.homestaybooking.shared.model.ApiData
@@ -20,7 +20,8 @@ import org.springframework.web.bind.annotation.*
 @RequestMapping("/api/bookings")
 class BookingController(private val bookingService: BookingService,
                         private val placeService: PlaceService,
-                        private val userService: UserService
+                        private val userService: UserService,
+                        private val promoService: PromoService
 ) {
     @get:GetMapping
     val allBooking: ApiData<List<BookingDetailResponse>>
@@ -32,13 +33,13 @@ class BookingController(private val bookingService: BookingService,
     }
 
     @PostMapping
-    fun addBooking(@RequestBody @Validated bookingRequest: BookingRequest): ApiData<BookingEntity> {
-        return ApiData(bookingService.addBooking(bookingRequest.toBookingEntity(placeService, userService)))
+    fun addBooking(@RequestBody @Validated bookingRequest: BookingRequest): ApiData<BookingDetailResponse> {
+        return ApiData(bookingService.addBooking(bookingRequest.toBookingEntity(placeService, userService, promoService)).toBookingDetailResponse())
     }
 
     @PutMapping
-    fun editBooking(@RequestBody @Validated bookingRequest: BookingRequest): ApiData<BookingEntity> {
-        return ApiData(bookingService.editBooking(bookingRequest.toBookingEntity(placeService, userService)))
+    fun editBooking(@RequestBody @Validated bookingRequest: BookingRequest): ApiData<BookingDetailResponse> {
+        return ApiData(bookingService.editBooking(bookingRequest.toBookingEntity(placeService, userService, promoService)).toBookingDetailResponse())
     }
 
     @Secured(ROLE_ADMIN)

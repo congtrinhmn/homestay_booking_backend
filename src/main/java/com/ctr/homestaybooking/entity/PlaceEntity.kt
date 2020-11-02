@@ -83,7 +83,7 @@ class PlaceEntity(
 
         @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true)
         @JoinColumn(name = "place_id")
-        var bookingSlotEntities: Set<BookingSlotEntity>?,
+        var bookingSlotEntities: MutableSet<BookingSlotEntity>,
 
         @ManyToOne
         @JoinColumn(name = "host_id")
@@ -149,6 +149,10 @@ class PlaceEntity(
             hostDetail = userEntity?.toUserDetailResponse(),
             wardDetailResponse = wardEntity?.toWardDetailResponse(),
             placeTypeId = placeTypeEntity?.id,
-            promos = promoEntities?.map { it.toPromoResponse() }?.toSet()
+            promos = promoEntities?.filter { it.startDate.before(Date()) && it.endDate.after(Date()) }
+                    ?.map { it.toPromoResponse() }
+                    ?.toSet()
     )
+
+    override fun toString() = toPlaceDetailResponse().toString()
 }

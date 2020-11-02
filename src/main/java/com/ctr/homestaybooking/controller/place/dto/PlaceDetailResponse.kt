@@ -61,7 +61,7 @@ data class PlaceDetailResponse(
 
         var amenities: Set<AmenityEntity>?,
 
-        var bookingSlots: Set<BookingSlotEntity>?,
+        var bookingSlots: Set<BookingSlotEntity>,
 
         var hostDetail: UserDetailResponse?,
 
