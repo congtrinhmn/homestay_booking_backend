@@ -26,7 +26,7 @@ data class UserDetailResponse(
 
         val roleEntities: Set<RoleEntity>,
 
-        val image: String,
+        val imageUrl: String,
 
         @field: NotBlank(message = NOT_BLANK_FIRST_NAME)
         val firstName: String,

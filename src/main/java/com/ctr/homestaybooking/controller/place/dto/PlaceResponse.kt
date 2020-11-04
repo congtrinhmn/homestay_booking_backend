@@ -32,5 +32,9 @@ data class PlaceResponse(
 
         var pricePerDay: Double?,
 
-        var images: Set<String>?
+        var images: Set<String>?,
+
+        var rateCount: Int = 0,
+
+        var rateAverage: Double = 0.0
 )

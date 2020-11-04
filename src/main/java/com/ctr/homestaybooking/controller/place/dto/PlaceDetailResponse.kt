@@ -1,10 +1,7 @@
 package com.ctr.homestaybooking.controller.place.dto
 
 import com.ctr.homestaybooking.controller.user.dto.UserDetailResponse
-import com.ctr.homestaybooking.entity.AmenityEntity
-import com.ctr.homestaybooking.entity.BookingSlotEntity
-import com.ctr.homestaybooking.entity.PromoResponse
-import com.ctr.homestaybooking.entity.WardDetailResponse
+import com.ctr.homestaybooking.entity.*
 import com.ctr.homestaybooking.shared.enums.BookingType
 import com.ctr.homestaybooking.shared.enums.CancelType
 import com.ctr.homestaybooking.shared.enums.PlaceStatus
@@ -61,7 +58,7 @@ data class PlaceDetailResponse(
 
         var amenities: Set<AmenityEntity>?,
 
-        var bookingSlots: Set<BookingSlotEntity>?,
+        var bookingSlots: Set<BookingSlotEntity>,
 
         var hostDetail: UserDetailResponse?,
 
@@ -69,5 +66,11 @@ data class PlaceDetailResponse(
 
         var placeTypeId: Int?,
 
-        var promos: Set<PromoResponse>?
+        var promos: Set<PromoResponse>?,
+
+        var reviews: Set<ReviewResponse>?,
+
+        var rateCount: Int = 0,
+
+        var rateAverage: String = "0.0"
 )

@@ -23,9 +23,13 @@ class PlaceController(private val placeService: PlaceService,
                       private val placeTypeService: PlaceTypeService,
                       private val amenityService: AmenityService
 ) {
-    @get:GetMapping
-    val allPlace: ApiData<List<PlaceResponse>>
-        get() = ApiData(placeService.getAllPlace().map { it.toPlaceResponse() })
+    @GetMapping
+    fun getAllPlace(@RequestParam(defaultValue = "0") page: Int,
+                    @RequestParam(defaultValue = "20") size: Int,
+                    @RequestParam(defaultValue = "id") sortBy: String
+    ): ApiData<List<PlaceResponse>> {
+        return ApiData(placeService.getAllPlace(page, size, sortBy).map { it.toPlaceResponse() })
+    }
 
     @GetMapping("/{id}")
     fun getPlaceById(@PathVariable("id") id: Int): ApiData<PlaceDetailResponse> {

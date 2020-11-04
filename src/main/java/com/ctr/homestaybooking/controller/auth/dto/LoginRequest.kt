@@ -5,7 +5,7 @@ import javax.validation.constraints.NotBlank
 import javax.validation.constraints.Pattern
 
 
-data class LoginDTO(
+data class LoginRequest(
         @field: NotBlank(message = NOT_BLANK_EMAIL)
         @field: Pattern(regexp = PATTERN_EMAIL, message = ERROR_EMAIL)
         val email: String,

@@ -1,8 +1,8 @@
 package com.ctr.homestaybooking.controller.auth
 
 import com.ctr.homestaybooking.config.TokenProvider
-import com.ctr.homestaybooking.controller.auth.dto.AuthTokenDTO
-import com.ctr.homestaybooking.controller.auth.dto.LoginDTO
+import com.ctr.homestaybooking.controller.auth.dto.AuthToken
+import com.ctr.homestaybooking.controller.auth.dto.LoginRequest
 import com.ctr.homestaybooking.controller.auth.dto.UserRequest
 import com.ctr.homestaybooking.service.AuthService
 import com.ctr.homestaybooking.service.UserService
@@ -24,7 +24,7 @@ class AuthenticationController(private val authenticationManager: Authentication
 
     @PostMapping("/register")
     @ResponseStatus(value = HttpStatus.CREATED)
-    fun register(@RequestBody @Validated userRequest: UserRequest): ResponseEntity<AuthTokenDTO> {
+    fun register(@RequestBody @Validated userRequest: UserRequest): ResponseEntity<AuthToken> {
         userService.addUser(userRequest.toUserEntity()).toUserDetailResponse().apply {
             val authentication = authenticationManager.authenticate(
                     UsernamePasswordAuthenticationToken(
@@ -34,12 +34,12 @@ class AuthenticationController(private val authenticationManager: Authentication
             )
             SecurityContextHolder.getContext().authentication = authentication
             val token = jwtTokenUtil.generateToken(authentication)
-            return ResponseEntity.ok(AuthTokenDTO(this, token))
+            return ResponseEntity.ok(AuthToken(this, token))
         }
     }
 
     @PostMapping("/login")
-    fun login(@RequestBody @Validated login: LoginDTO): ResponseEntity<AuthTokenDTO> {
+    fun login(@RequestBody @Validated login: LoginRequest): ResponseEntity<AuthToken> {
         if (authenticationService.isHandleEmail(login.email) &&
                 authenticationService.isHandleStatus(login.email)) {
             return try {
@@ -51,7 +51,7 @@ class AuthenticationController(private val authenticationManager: Authentication
                 )
                 SecurityContextHolder.getContext().authentication = authentication
                 val token = jwtTokenUtil.generateToken(authentication)
-                ResponseEntity.ok(AuthTokenDTO(userService.getUserByEmail(login.email).toUserDetailResponse(), token))
+                ResponseEntity.ok(AuthToken(userService.getUserByEmail(login.email).toUserDetailResponse(), token))
             } catch (e: Exception) {
                 throw PasswordLoginFailedException()
             }
@@ -60,7 +60,7 @@ class AuthenticationController(private val authenticationManager: Authentication
     }
 
     @PostMapping("/autoLogin")
-    fun autoLogin(@RequestBody @Validated token: String): ResponseEntity<AuthTokenDTO> {
+    fun autoLogin(@RequestBody @Validated token: String): ResponseEntity<AuthToken> {
         val email = jwtTokenUtil.getUsernameFromToken(token)
         val password = ""
         if (authenticationService.isHandleEmail(email) &&
@@ -73,7 +73,7 @@ class AuthenticationController(private val authenticationManager: Authentication
                         )
                 )
                 SecurityContextHolder.getContext().authentication = authentication
-                ResponseEntity.ok(AuthTokenDTO(userService.getUserByEmail(email).toUserDetailResponse(), token))
+                ResponseEntity.ok(AuthToken(userService.getUserByEmail(email).toUserDetailResponse(), token))
             } catch (e: Exception) {
                 throw PasswordLoginFailedException()
             }

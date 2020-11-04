@@ -3,6 +3,7 @@ package com.ctr.homestaybooking.entity
 import com.ctr.homestaybooking.controller.place.dto.PlaceDetailResponse
 import com.ctr.homestaybooking.controller.user.dto.UserDetailResponse
 import com.ctr.homestaybooking.service.PlaceService
+import com.ctr.homestaybooking.service.PromoService
 import com.ctr.homestaybooking.service.UserService
 import com.ctr.homestaybooking.shared.FORMAT_DATE
 import com.ctr.homestaybooking.shared.FORMAT_DATE_TIME
@@ -45,7 +46,7 @@ class BookingEntity(
         @DateTimeFormat(pattern = FORMAT_DATE_TIME)
         var cancerDate: Date?,
 
-        var isRefund: Boolean = false,
+        var isRefund: Boolean? = false,
 
         var refundPaid: Double?,
 
@@ -58,7 +59,14 @@ class BookingEntity(
 
         @ManyToOne
         @JoinColumn(name = "user_id")
-        var userEntity: UserEntity
+        var userEntity: UserEntity,
+
+        @ManyToOne
+        @JoinColumn(name = "promo_id")
+        var promoEntity: PromoEntity?,
+
+        @OneToOne(mappedBy = "bookingEntity")
+        var reviewEntity: ReviewEntity? = null
 ) {
     fun toBookingDetailResponse() = BookingDetailResponse(
             id = id,
@@ -69,43 +77,17 @@ class BookingEntity(
             priceForStay = priceForStay,
             taxPaid = taxPaid,
             totalPaid = totalPaid,
-            cancerDate = null,
-            isRefund = false,
-            refundPaid = null,
+            cancerDate = cancerDate,
+            isRefund = isRefund,
+            refundPaid = refundPaid,
             bookingStatus = bookingStatus,
             place = placeEntity.toPlaceDetailResponse(),
-            user = userEntity.toUserDetailResponse()
+            user = userEntity.toUserDetailResponse(),
+            promo = promoEntity?.toPromoResponse(),
+            reviewEntity = reviewEntity
     )
-}
 
-data class BookingRequest(
-        var createDate: Date,
-        var startDate: Date,
-        var endDate: Date,
-        var pricePerDay: Double,
-        var priceForStay: Double,
-        var taxPaid: Double,
-        var totalPaid: Double,
-        var bookingStatus: BookingStatus,
-        var placeId: Int,
-        var userId: Int
-) {
-    fun toBookingEntity(placeService: PlaceService, userService: UserService) = BookingEntity(
-            id = 0,
-            createDate = createDate,
-            startDate = startDate,
-            endDate = endDate,
-            pricePerDay = pricePerDay,
-            priceForStay = priceForStay,
-            taxPaid = taxPaid,
-            totalPaid = totalPaid,
-            cancerDate = null,
-            isRefund = false,
-            refundPaid = null,
-            bookingStatus = bookingStatus,
-            placeEntity = placeService.getPlaceByID(placeId),
-            userEntity = userService.getUserById(userId)
-    )
+    override fun toString() = toBookingDetailResponse().toString()
 }
 
 data class BookingDetailResponse(
@@ -118,9 +100,45 @@ data class BookingDetailResponse(
         var taxPaid: Double,
         var totalPaid: Double,
         var cancerDate: Date?,
-        var isRefund: Boolean = false,
+        var isRefund: Boolean? = false,
         var refundPaid: Double?,
         var bookingStatus: BookingStatus,
         var place: PlaceDetailResponse,
-        var user: UserDetailResponse
+        var user: UserDetailResponse,
+        var promo: PromoResponse?,
+        var reviewEntity: ReviewEntity?
 )
+
+
+data class BookingRequest(
+        var id: Int,
+        var createDate: Date,
+        var startDate: Date,
+        var endDate: Date,
+        var pricePerDay: Double,
+        var priceForStay: Double,
+        var taxPaid: Double,
+        var totalPaid: Double,
+        var bookingStatus: BookingStatus,
+        var placeId: Int,
+        var userId: Int,
+        var promoId: Int?
+) {
+    fun toBookingEntity(placeService: PlaceService, userService: UserService, promoService: PromoService) = BookingEntity(
+            id = id,
+            createDate = createDate,
+            startDate = startDate,
+            endDate = endDate,
+            pricePerDay = pricePerDay,
+            priceForStay = priceForStay,
+            taxPaid = taxPaid,
+            totalPaid = totalPaid,
+            cancerDate = null,
+            isRefund = false,
+            refundPaid = null,
+            bookingStatus = bookingStatus,
+            placeEntity = placeService.getPlaceByID(placeId),
+            userEntity = userService.getUserById(userId),
+            promoEntity = promoId?.let { promoService.getPromoById(it) }
+    )
+}

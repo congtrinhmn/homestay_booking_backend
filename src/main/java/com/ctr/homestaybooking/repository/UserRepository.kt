@@ -7,7 +7,7 @@ import org.springframework.data.repository.query.Param
 import javax.transaction.Transactional
 
 @Transactional
-interface UserRepository : JpaRepository<UserEntity?, Int?> {
+interface UserRepository : JpaRepository<UserEntity, Int> {
     fun findByEmail(email: String): UserEntity?
 
     @Query(value = """SELECT * FROM users where email like CONCAT('%', :keyword , '%')
