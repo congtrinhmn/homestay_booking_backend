@@ -63,7 +63,10 @@ class BookingEntity(
 
         @ManyToOne
         @JoinColumn(name = "promo_id")
-        var promoEntity: PromoEntity?
+        var promoEntity: PromoEntity?,
+
+        @OneToOne(mappedBy = "bookingEntity")
+        var reviewEntity: ReviewEntity? = null
 ) {
     fun toBookingDetailResponse() = BookingDetailResponse(
             id = id,
@@ -80,7 +83,8 @@ class BookingEntity(
             bookingStatus = bookingStatus,
             place = placeEntity.toPlaceDetailResponse(),
             user = userEntity.toUserDetailResponse(),
-            promo = promoEntity?.toPromoResponse()
+            promo = promoEntity?.toPromoResponse(),
+            reviewEntity = reviewEntity
     )
 
     override fun toString() = toBookingDetailResponse().toString()
@@ -101,7 +105,8 @@ data class BookingDetailResponse(
         var bookingStatus: BookingStatus,
         var place: PlaceDetailResponse,
         var user: UserDetailResponse,
-        var promo: PromoResponse?
+        var promo: PromoResponse?,
+        var reviewEntity: ReviewEntity?
 )
 
 
@@ -117,7 +122,7 @@ data class BookingRequest(
         var bookingStatus: BookingStatus,
         var placeId: Int,
         var userId: Int,
-        var promoId: Int
+        var promoId: Int?
 ) {
     fun toBookingEntity(placeService: PlaceService, userService: UserService, promoService: PromoService) = BookingEntity(
             id = id,
@@ -134,6 +139,6 @@ data class BookingRequest(
             bookingStatus = bookingStatus,
             placeEntity = placeService.getPlaceByID(placeId),
             userEntity = userService.getUserById(userId),
-            promoEntity = promoService.getPromoById(promoId)
+            promoEntity = promoId?.let { promoService.getPromoById(it) }
     )
 }

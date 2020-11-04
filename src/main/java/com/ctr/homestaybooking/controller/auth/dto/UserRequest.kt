@@ -1,6 +1,5 @@
 package com.ctr.homestaybooking.controller.auth.dto
 
-import com.ctr.homestaybooking.entity.ImageEntity
 import com.ctr.homestaybooking.entity.RoleEntity
 import com.ctr.homestaybooking.entity.UserEntity
 import com.ctr.homestaybooking.shared.*
@@ -27,7 +26,7 @@ data class UserRequest(
         @field: NotBlank(message = NOT_BLANK_DEVICE_TOKEN)
         val deviceToken: String,
 
-        val image: String,
+        val imageUrl: String,
 
         @field: NotBlank(message = NOT_BLANK_FIRST_NAME)
         val firstName: String,
@@ -48,6 +47,6 @@ data class UserRequest(
         val phoneNumber: String
 ) {
     fun toUserEntity(): UserEntity {
-        return UserEntity(0, email, uuid, deviceToken, password, setOf(RoleEntity(1, ROLE_USER)), ImageEntity(url = image), firstName, lastName, gender, birthday, phoneNumber)
+            return UserEntity(0, email, uuid, deviceToken, password, setOf(RoleEntity(1, ROLE_USER)), imageUrl, firstName, lastName, gender, birthday, phoneNumber)
     }
 }

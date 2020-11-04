@@ -38,9 +38,8 @@ class UserEntity(
                 inverseJoinColumns = [JoinColumn(name = "role_id")])
         var roleEntities: Set<RoleEntity>,
 
-        @OneToOne(cascade = [CascadeType.ALL], orphanRemoval = true)
-        @JoinColumn(name = "image_id")
-        var imageEntity: ImageEntity,
+        @NotBlank
+        var imageUrl: String,
 
         @NotBlank
         var firstName: String,
@@ -63,7 +62,7 @@ class UserEntity(
         var status: UserStatus = UserStatus.ACTIVE
 ) {
     fun toUserDetailResponse(): UserDetailResponse {
-        return UserDetailResponse(id, email, uuid, deviceToken, roleEntities, imageEntity.url, firstName, lastName, gender, birthday, phoneNumber)
+        return UserDetailResponse(id, email, uuid, deviceToken, roleEntities, imageUrl, firstName, lastName, gender, birthday, phoneNumber)
     }
 }
 

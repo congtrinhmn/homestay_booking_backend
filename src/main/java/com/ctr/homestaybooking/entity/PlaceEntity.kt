@@ -7,6 +7,7 @@ import com.ctr.homestaybooking.shared.enums.BookingType
 import com.ctr.homestaybooking.shared.enums.CancelType
 import com.ctr.homestaybooking.shared.enums.PlaceStatus
 import com.ctr.homestaybooking.shared.enums.SubmitStatus
+import com.ctr.homestaybooking.shared.format
 import org.springframework.format.annotation.DateTimeFormat
 import java.util.*
 import javax.persistence.*
@@ -98,7 +99,10 @@ class PlaceEntity(
         var placeTypeEntity: PlaceTypeEntity?,
 
         @ManyToMany(mappedBy = "placeEntities")
-        var promoEntities: Set<PromoEntity>?
+        var promoEntities: Set<PromoEntity>?,
+
+        @OneToMany(mappedBy = "placeEntity", orphanRemoval = true)
+        var reviewEntities: Set<ReviewEntity>?
 ) {
     @PreRemove
     private fun removePlaceFromPromo() {
@@ -120,7 +124,10 @@ class PlaceEntity(
             bathroomCount = bathroomCount,
             size = size,
             pricePerDay = pricePerDay,
-            images = imageEntities?.map { it.url }?.toSet()
+            images = imageEntities?.map { it.url }?.toSet(),
+            rateCount = reviewEntities?.size ?: 0,
+            rateAverage = reviewEntities?.let { reviews -> reviews.sumBy { it.rating }.toDouble().div(reviews.size) }
+                    ?: 0.0
     )
 
     fun toPlaceDetailResponse() = PlaceDetailResponse(
@@ -151,7 +158,11 @@ class PlaceEntity(
             placeTypeId = placeTypeEntity?.id,
             promos = promoEntities?.filter { it.startDate.before(Date()) && it.endDate.after(Date()) }
                     ?.map { it.toPromoResponse() }
-                    ?.toSet()
+                    ?.toSet(),
+            reviews = reviewEntities?.map { it.toReviewResponse() }?.toSet(),
+            rateCount = reviewEntities?.size ?: 0,
+            rateAverage = reviewEntities?.let { reviews -> reviews.sumBy { it.rating }.toDouble().div(reviews.size) }?.format(2)
+                    ?: "0.0"
     )
 
     override fun toString() = toPlaceDetailResponse().toString()

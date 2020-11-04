@@ -72,3 +72,5 @@ fun Calendar.format(format: String = FORMAT_DATE_TIME): String {
 //fun convert(targetString: String, targetFormat: String, resultFormat: String): String {
 //    return parse(targetString, targetFormat).format(resultFormat)
 //}
+
+fun Double.format(digits: Int) = "%.${digits}f".format(this)
