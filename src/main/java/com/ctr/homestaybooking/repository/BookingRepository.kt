@@ -6,4 +6,4 @@ import org.springframework.data.jpa.repository.JpaRepository
 /**
  * Created by at-trinhnguyen2 on 2020/10/29
  */
-interface BookingRepository : JpaRepository<BookingEntity?, Int?>
+interface BookingRepository : JpaRepository<BookingEntity, Int>

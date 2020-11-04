@@ -8,10 +8,15 @@ import com.ctr.homestaybooking.entity.WardEntity
 import com.ctr.homestaybooking.repository.BookingSlotRepository
 import com.ctr.homestaybooking.repository.PlaceRepository
 import com.ctr.homestaybooking.shared.enums.DateStatus
+import com.ctr.homestaybooking.shared.enums.PlaceStatus
 import com.ctr.homestaybooking.shared.isContain
 import com.ctr.homestaybooking.shared.toNullable
+import org.springframework.data.domain.PageRequest
+import org.springframework.data.domain.Pageable
+import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Service
 import java.util.*
+
 
 /**
  * Created by at-trinhnguyen2 on 2020/10/19
@@ -21,7 +26,10 @@ class PlaceService(private val placeRepository: PlaceRepository,
                    private val bookingSlotRepository: BookingSlotRepository
 ) {
 
-    fun getAllPlace(): List<PlaceEntity> = placeRepository.findAll().filterIsInstance<PlaceEntity>()
+    fun getAllPlace(page: Int, size: Int, sortBy: String): List<PlaceEntity> {
+        val paging: Pageable = PageRequest.of(page, size, Sort.by(sortBy))
+        return placeRepository.findByStatus(PlaceStatus.LISTED, paging)
+    }
 
     fun getPlaceByID(id: Int): PlaceEntity =
             placeRepository.findById(id).toNullable() ?: throw  PlaceNotFoundException(id)
@@ -30,7 +38,7 @@ class PlaceService(private val placeRepository: PlaceRepository,
             placeRepository.findAllById(ids).filterIsInstance<PlaceEntity>().toSet()
 
     fun getPlacesByWardEntity(wardEntity: WardEntity): Set<PlaceEntity> =
-            placeRepository.findByWardEntity(wardEntity) ?: throw  NotFoundException("Ward", wardEntity.id)
+            placeRepository.findByWardEntity(wardEntity)
 
     fun getPlacesByDistrictId(id: Int): Set<PlaceEntity> =
             placeRepository.findByDistrictId(id) ?: throw  NotFoundException("District", id)
@@ -49,18 +57,17 @@ class PlaceService(private val placeRepository: PlaceRepository,
     fun deletePlaceByID(id: Int): PlaceEntity {
         val placeEntity: PlaceEntity = placeRepository.findById(id).toNullable()
                 ?: throw PlaceNotFoundException(id)
-        placeRepository.delete(placeEntity)
-        return placeEntity
+        placeEntity.status = PlaceStatus.DELETED
+        return placeRepository.save(placeEntity)
     }
 
     fun updateBookingSlotById(id: Int, bookingDates: Set<Date>): PlaceEntity {
         val placeEntity = placeRepository.findById(id).toNullable() ?: throw PlaceNotFoundException(id)
         placeEntity.bookingSlotEntities.apply {
-            val dates = map { it.date }.apply { println("-- dates ${this}") }
+            val dates = map { it.date }
             // add booking date if bookingSlots don't have
             bookingDates.forEach {
                 if (!dates.isContain(it)) {
-                    it.apply { println("-- date ${this}") }
                     add(BookingSlotEntity(date = it))
                 }
             }

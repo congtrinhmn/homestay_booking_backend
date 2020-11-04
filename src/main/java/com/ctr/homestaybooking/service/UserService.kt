@@ -11,6 +11,9 @@ import com.ctr.homestaybooking.repository.UserRepository
 import com.ctr.homestaybooking.shared.enums.Role
 import com.ctr.homestaybooking.shared.enums.UserStatus
 import com.ctr.homestaybooking.shared.toNullable
+import org.springframework.data.domain.PageRequest
+import org.springframework.data.domain.Pageable
+import org.springframework.data.domain.Sort
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.stereotype.Service
 
@@ -18,7 +21,10 @@ import org.springframework.stereotype.Service
 class UserService(private val userRepository: UserRepository,
                   private val roleRepository: RoleRepository) {
 
-    fun getAllUser(): List<UserEntity> = userRepository.findAll().filterIsInstance<UserEntity>()
+    fun getAllUser(page: Int, size: Int, sortBy: String): List<UserEntity> {
+        val paging: Pageable = PageRequest.of(page, size, Sort.by(sortBy))
+        return userRepository.findAll(paging).content
+    }
 
     fun getUserById(id: Int): UserEntity {
         return userRepository.findById(id).toNullable() ?: throw UserNotFoundException(id)

@@ -13,14 +13,18 @@ import org.springframework.web.bind.annotation.*
 @RequestMapping("/api/users")
 class UserController(private val userService: UserService) {
 
+    @GetMapping
+    fun getAllUser(@RequestParam(defaultValue = "0") page: Int,
+                   @RequestParam(defaultValue = "20") size: Int,
+                   @RequestParam(defaultValue = "id") sortBy: String
+    ): ApiData<List<UserDetailResponse>> {
+        return ApiData(userService.getAllUser(page, size, sortBy).map { it.toUserDetailResponse() })
+    }
+
     @GetMapping("/{id}")
     fun getUserById(@PathVariable("id") id: Int): ApiData<UserDetailResponse> {
         return ApiData(userService.getUserById(id).toUserDetailResponse())
     }
-
-    @get:GetMapping
-    val allUser: ApiData<List<UserDetailResponse>>
-        get() = ApiData(userService.getAllUser().map { it.toUserDetailResponse() })
 
     @PutMapping
     fun editUser(@RequestBody @Validated userRequest: UserRequest): ApiData<UserDetailResponse> {
