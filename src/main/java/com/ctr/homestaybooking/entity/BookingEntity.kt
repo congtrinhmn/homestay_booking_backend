@@ -1,7 +1,6 @@
 package com.ctr.homestaybooking.entity
 
-import com.ctr.homestaybooking.controller.place.dto.PlaceDetailResponse
-import com.ctr.homestaybooking.controller.user.dto.UserDetailResponse
+import com.ctr.homestaybooking.controller.place.dto.PlaceDetailDto
 import com.ctr.homestaybooking.service.PlaceService
 import com.ctr.homestaybooking.service.PromoService
 import com.ctr.homestaybooking.service.UserService
@@ -68,7 +67,7 @@ class BookingEntity(
         @OneToOne(mappedBy = "bookingEntity")
         var reviewEntity: ReviewEntity? = null
 ) {
-    fun toBookingDetailResponse() = BookingDetailResponse(
+    fun toBookingDetailDto() = BookingDetailDto(
             id = id,
             createDate = createDate,
             startDate = startDate,
@@ -81,16 +80,16 @@ class BookingEntity(
             isRefund = isRefund,
             refundPaid = refundPaid,
             bookingStatus = bookingStatus,
-            place = placeEntity.toPlaceDetailResponse(),
-            user = userEntity.toUserDetailResponse(),
-            promo = promoEntity?.toPromoResponse(),
+            place = placeEntity.toPlaceDetailDto(),
+            user = userEntity.toUserDetailDto(),
+            promo = promoEntity?.toPromoDto(),
             reviewEntity = reviewEntity
     )
 
-    override fun toString() = toBookingDetailResponse().toString()
+    override fun toString() = toBookingDetailDto().toString()
 }
 
-data class BookingDetailResponse(
+data class BookingDetailDto(
         var id: Int,
         var createDate: Date,
         var startDate: Date,
@@ -103,9 +102,9 @@ data class BookingDetailResponse(
         var isRefund: Boolean? = false,
         var refundPaid: Double?,
         var bookingStatus: BookingStatus,
-        var place: PlaceDetailResponse,
-        var user: UserDetailResponse,
-        var promo: PromoResponse?,
+        var place: PlaceDetailDto,
+        var user: UserDetailDto,
+        var promo: PromoDto?,
         var reviewEntity: ReviewEntity?
 )
 

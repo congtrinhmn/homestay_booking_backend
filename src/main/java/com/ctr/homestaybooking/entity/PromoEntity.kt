@@ -1,6 +1,6 @@
 package com.ctr.homestaybooking.entity
 
-import com.ctr.homestaybooking.controller.place.dto.PlaceResponse
+import com.ctr.homestaybooking.controller.place.dto.PlaceDto
 import com.ctr.homestaybooking.service.PlaceService
 import com.ctr.homestaybooking.shared.FORMAT_DATE_TIME
 import org.springframework.format.annotation.DateTimeFormat
@@ -49,7 +49,7 @@ class PromoEntity(
         var placeEntities: MutableSet<PlaceEntity>
 ) {
 
-    fun toPromoResponse() = PromoResponse(
+    fun toPromoDto() = PromoDto(
             id = id,
             name = name,
             description = description,
@@ -60,7 +60,7 @@ class PromoEntity(
             discountPercent = discountPercent
     )
 
-    fun toPromoDetailResponse() = PromoDetailResponse(
+    fun toPromoDetailDto() = PromoDetailDto(
             id = id,
             name = name,
             description = description,
@@ -69,11 +69,11 @@ class PromoEntity(
             endDate = endDate,
             discount = discount,
             discountPercent = discountPercent,
-            places = placeEntities.map { it.toPlaceResponse() }.toSet()
+            places = placeEntities.map { it.toPlaceDto() }.toSet()
     )
 }
 
-data class PromoResponse(
+data class PromoDto(
         var id: Int,
         var name: String,
         var description: String = "",
@@ -84,7 +84,7 @@ data class PromoResponse(
         var discountPercent: Double?
 )
 
-data class PromoDetailResponse(
+data class PromoDetailDto(
         var id: Int,
         var name: String,
         var description: String = "",
@@ -93,7 +93,7 @@ data class PromoDetailResponse(
         var endDate: Date,
         var discount: Double?,
         var discountPercent: Double?,
-        var places: Set<PlaceResponse>?
+        var places: Set<PlaceDto>?
 )
 
 data class PromoRequest(

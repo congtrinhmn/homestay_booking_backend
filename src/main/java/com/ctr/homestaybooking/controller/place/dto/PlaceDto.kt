@@ -6,7 +6,7 @@ import com.ctr.homestaybooking.shared.enums.BookingType
  * Created by at-trinhnguyen2 on 2020/10/26
  */
 
-data class PlaceResponse(
+data class PlaceDto(
 
         var id: Int = 0,
 

@@ -1,7 +1,7 @@
 package com.ctr.homestaybooking.entity
 
-import com.ctr.homestaybooking.controller.place.dto.PlaceDetailResponse
-import com.ctr.homestaybooking.controller.place.dto.PlaceResponse
+import com.ctr.homestaybooking.controller.place.dto.PlaceDetailDto
+import com.ctr.homestaybooking.controller.place.dto.PlaceDto
 import com.ctr.homestaybooking.shared.FORMAT_TIME
 import com.ctr.homestaybooking.shared.enums.BookingType
 import com.ctr.homestaybooking.shared.enums.CancelType
@@ -111,7 +111,7 @@ class PlaceEntity(
         }
     }
 
-    fun toPlaceResponse() = PlaceResponse(
+    fun toPlaceDto() = PlaceDto(
             id = id,
             name = name,
             description = description,
@@ -130,7 +130,7 @@ class PlaceEntity(
                     ?: 0.0
     )
 
-    fun toPlaceDetailResponse() = PlaceDetailResponse(
+    fun toPlaceDetailDto() = PlaceDetailDto(
             id = id,
             name = name,
             description = description,
@@ -153,17 +153,17 @@ class PlaceEntity(
             images = imageEntities?.map { it.url }?.toSet(),
             amenities = amenityEntities,
             bookingSlots = bookingSlotEntities,
-            hostDetail = userEntity?.toUserDetailResponse(),
-            wardDetailResponse = wardEntity?.toWardDetailResponse(),
+            hostDetail = userEntity?.toUserDetailDto(),
+            wardDetailDto = wardEntity?.toWardDetailDto(),
             placeTypeId = placeTypeEntity?.id,
             promos = promoEntities?.filter { it.startDate.before(Date()) && it.endDate.after(Date()) }
-                    ?.map { it.toPromoResponse() }
+                    ?.map { it.toPromoDto() }
                     ?.toSet(),
-            reviews = reviewEntities?.map { it.toReviewResponse() }?.toSet(),
+            reviews = reviewEntities?.map { it.toReviewDto() }?.toSet(),
             rateCount = reviewEntities?.size ?: 0,
             rateAverage = reviewEntities?.let { reviews -> reviews.sumBy { it.rating }.toDouble().div(reviews.size) }?.format(2)
                     ?: "0.0"
     )
 
-    override fun toString() = toPlaceDetailResponse().toString()
+    override fun toString() = toPlaceDetailDto().toString()
 }

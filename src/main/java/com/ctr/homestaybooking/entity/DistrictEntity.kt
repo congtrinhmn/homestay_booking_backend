@@ -26,11 +26,11 @@ class DistrictEntity(
         @JoinColumn(name = "province_id")
         var provinceEntity: ProvinceEntity? = null
 ) {
-    fun toDistrictResponse() = DistrictResponse(id, type, name, wardEntities?.map { it.toWardResponse() })
+    fun toDistrictDto() = DistrictDto(id, type, name, wardEntities?.map { it.toWardDto() })
 
-    fun toDistrictDetailResponse() = DistrictDetailResponse(id, type, name, provinceEntity?.toProvinceResponse())
+    fun toDistrictDetailDto() = DistrictDetailDto(id, type, name, provinceEntity?.toProvinceResponse())
 }
 
-data class DistrictResponse(var id: Int = 0, var type: String, var name: String, val wards: List<WardResponse>?)
+data class DistrictDto(var id: Int = 0, var type: String, var name: String, val wards: List<WardDto>?)
 
-data class DistrictDetailResponse(var id: Int = 0, var type: String, var name: String, val provinceResponse: ProvinceResponse?)
+data class DistrictDetailDto(var id: Int = 0, var type: String, var name: String, val provinceDto: ProvinceDto?)

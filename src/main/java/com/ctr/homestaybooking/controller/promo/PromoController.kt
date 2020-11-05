@@ -1,6 +1,6 @@
 package com.ctr.homestaybooking.controller.promo
 
-import com.ctr.homestaybooking.entity.PromoDetailResponse
+import com.ctr.homestaybooking.entity.PromoDetailDto
 import com.ctr.homestaybooking.entity.PromoRequest
 import com.ctr.homestaybooking.service.PlaceService
 import com.ctr.homestaybooking.service.PromoService
@@ -19,22 +19,22 @@ class PromoController(private val promoService: PromoService,
                       private val placeService: PlaceService
 ) {
     @get:GetMapping
-    val allPromoDetail: ApiData<List<PromoDetailResponse>>
-        get() = ApiData(promoService.getAllPromo().map { it.toPromoDetailResponse() })
+    val allPromoDetail: ApiData<List<PromoDetailDto>>
+        get() = ApiData(promoService.getAllPromo().map { it.toPromoDetailDto() })
 
     @GetMapping("/{id}")
-    fun getPromoById(@PathVariable("id") id: Int): ApiData<PromoDetailResponse> {
-        return ApiData(promoService.getPromoById(id).toPromoDetailResponse())
+    fun getPromoById(@PathVariable("id") id: Int): ApiData<PromoDetailDto> {
+        return ApiData(promoService.getPromoById(id).toPromoDetailDto())
     }
 
     @PostMapping
-    fun addPromo(@RequestBody @Validated promoRequest: PromoRequest): ApiData<PromoDetailResponse> {
-        return ApiData(promoService.addPromo(promoRequest.toPromoEntity(placeService)).toPromoDetailResponse())
+    fun addPromo(@RequestBody @Validated promoRequest: PromoRequest): ApiData<PromoDetailDto> {
+        return ApiData(promoService.addPromo(promoRequest.toPromoEntity(placeService)).toPromoDetailDto())
     }
 
     @PutMapping
-    fun editPromo(@RequestBody @Validated promoRequest: PromoRequest): ApiData<PromoDetailResponse> {
-        return ApiData(promoService.editPromo(promoRequest.toPromoEntity(placeService)).toPromoDetailResponse())
+    fun editPromo(@RequestBody @Validated promoRequest: PromoRequest): ApiData<PromoDetailDto> {
+        return ApiData(promoService.editPromo(promoRequest.toPromoEntity(placeService)).toPromoDetailDto())
     }
 
     @Secured(ROLE_ADMIN)

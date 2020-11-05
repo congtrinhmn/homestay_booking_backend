@@ -1,7 +1,7 @@
 package com.ctr.homestaybooking.controller.place.dto
 
+import com.ctr.homestaybooking.entity.BookingSlotDto
 import com.ctr.homestaybooking.entity.BookingSlotEntity
-import com.ctr.homestaybooking.entity.BookingSlotResponse
 import com.ctr.homestaybooking.entity.ImageEntity
 import com.ctr.homestaybooking.entity.PlaceEntity
 import com.ctr.homestaybooking.service.AmenityService
@@ -70,7 +70,7 @@ data class PlaceRequest(
 
         var amenities: List<Int>?,
 
-        var bookingSlots: Set<BookingSlotResponse>?,
+        var bookingSlots: Set<BookingSlotDto>?,
 
         @NotNull
         var userId: Int,

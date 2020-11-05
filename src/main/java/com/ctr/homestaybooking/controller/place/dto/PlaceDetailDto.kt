@@ -1,6 +1,5 @@
 package com.ctr.homestaybooking.controller.place.dto
 
-import com.ctr.homestaybooking.controller.user.dto.UserDetailResponse
 import com.ctr.homestaybooking.entity.*
 import com.ctr.homestaybooking.shared.enums.BookingType
 import com.ctr.homestaybooking.shared.enums.CancelType
@@ -12,7 +11,7 @@ import java.util.*
  * Created by at-trinhnguyen2 on 2020/10/26
  */
 
-data class PlaceDetailResponse(
+data class PlaceDetailDto(
 
         var id: Int = 0,
 
@@ -60,15 +59,15 @@ data class PlaceDetailResponse(
 
         var bookingSlots: Set<BookingSlotEntity>,
 
-        var hostDetail: UserDetailResponse?,
+        var hostDetail: UserDetailDto?,
 
-        var wardDetailResponse: WardDetailResponse?,
+        var wardDetailDto: WardDetailDto?,
 
         var placeTypeId: Int?,
 
-        var promos: Set<PromoResponse>?,
+        var promos: Set<PromoDto>?,
 
-        var reviews: Set<ReviewResponse>?,
+        var reviews: Set<ReviewDto>?,
 
         var rateCount: Int = 0,
 

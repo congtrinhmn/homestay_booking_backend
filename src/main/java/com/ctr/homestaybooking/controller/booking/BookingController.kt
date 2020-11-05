@@ -1,6 +1,6 @@
 package com.ctr.homestaybooking.controller.booking
 
-import com.ctr.homestaybooking.entity.BookingDetailResponse
+import com.ctr.homestaybooking.entity.BookingDetailDto
 import com.ctr.homestaybooking.entity.BookingRequest
 import com.ctr.homestaybooking.service.BookingService
 import com.ctr.homestaybooking.service.PlaceService
@@ -24,22 +24,22 @@ class BookingController(private val bookingService: BookingService,
                         private val promoService: PromoService
 ) {
     @get:GetMapping
-    val allBooking: ApiData<List<BookingDetailResponse>>
-        get() = ApiData(bookingService.getAllBooking().map { it.toBookingDetailResponse() })
+    val allBooking: ApiData<List<BookingDetailDto>>
+        get() = ApiData(bookingService.getAllBooking().map { it.toBookingDetailDto() })
 
     @GetMapping("/{id}")
-    fun getBookingById(@PathVariable("id") id: Int): ApiData<BookingDetailResponse> {
-        return ApiData(bookingService.getBookingById(id).toBookingDetailResponse())
+    fun getBookingById(@PathVariable("id") id: Int): ApiData<BookingDetailDto> {
+        return ApiData(bookingService.getBookingById(id).toBookingDetailDto())
     }
 
     @PostMapping
-    fun addBooking(@RequestBody @Validated bookingRequest: BookingRequest): ApiData<BookingDetailResponse> {
-        return ApiData(bookingService.addBooking(bookingRequest.toBookingEntity(placeService, userService, promoService)).toBookingDetailResponse())
+    fun addBooking(@RequestBody @Validated bookingRequest: BookingRequest): ApiData<BookingDetailDto> {
+        return ApiData(bookingService.addBooking(bookingRequest.toBookingEntity(placeService, userService, promoService)).toBookingDetailDto())
     }
 
     @PutMapping
-    fun editBooking(@RequestBody @Validated bookingRequest: BookingRequest): ApiData<BookingDetailResponse> {
-        return ApiData(bookingService.editBooking(bookingRequest.toBookingEntity(placeService, userService, promoService)).toBookingDetailResponse())
+    fun editBooking(@RequestBody @Validated bookingRequest: BookingRequest): ApiData<BookingDetailDto> {
+        return ApiData(bookingService.editBooking(bookingRequest.toBookingEntity(placeService, userService, promoService)).toBookingDetailDto())
     }
 
     @Secured(ROLE_ADMIN)

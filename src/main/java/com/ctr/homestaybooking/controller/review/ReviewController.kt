@@ -1,7 +1,7 @@
 package com.ctr.homestaybooking.controller.review
 
+import com.ctr.homestaybooking.entity.ReviewDto
 import com.ctr.homestaybooking.entity.ReviewRequest
-import com.ctr.homestaybooking.entity.ReviewResponse
 import com.ctr.homestaybooking.service.BookingService
 import com.ctr.homestaybooking.service.PlaceService
 import com.ctr.homestaybooking.service.ReviewService
@@ -23,22 +23,22 @@ class ReviewController(private val reviewService: ReviewService,
                        private val bookingService: BookingService
 ) {
     @get:GetMapping
-    val allReviewDetail: ApiData<List<ReviewResponse>>
-        get() = ApiData(reviewService.getAllReview().map { it.toReviewResponse() })
+    val allReviewDetail: ApiData<List<ReviewDto>>
+        get() = ApiData(reviewService.getAllReview().map { it.toReviewDto() })
 
     @GetMapping("/{id}")
-    fun getReviewById(@PathVariable("id") id: Int): ApiData<ReviewResponse> {
-        return ApiData(reviewService.getReviewById(id).toReviewResponse())
+    fun getReviewById(@PathVariable("id") id: Int): ApiData<ReviewDto> {
+        return ApiData(reviewService.getReviewById(id).toReviewDto())
     }
 
     @PostMapping
-    fun addReview(@RequestBody @Validated reviewRequest: ReviewRequest): ApiData<ReviewResponse> {
-        return ApiData(reviewService.addReview(reviewRequest.toReviewEntity(userService, placeService, bookingService)).toReviewResponse())
+    fun addReview(@RequestBody @Validated reviewRequest: ReviewRequest): ApiData<ReviewDto> {
+        return ApiData(reviewService.addReview(reviewRequest.toReviewEntity(userService, placeService, bookingService)).toReviewDto())
     }
 
     @PutMapping
-    fun editReview(@RequestBody @Validated reviewRequest: ReviewRequest): ApiData<ReviewResponse> {
-        return ApiData(reviewService.editReview(reviewRequest.toReviewEntity(userService, placeService, bookingService)).toReviewResponse())
+    fun editReview(@RequestBody @Validated reviewRequest: ReviewRequest): ApiData<ReviewDto> {
+        return ApiData(reviewService.editReview(reviewRequest.toReviewEntity(userService, placeService, bookingService)).toReviewDto())
     }
 
     @Secured(ROLE_ADMIN)
