@@ -1,8 +1,8 @@
 package com.ctr.homestaybooking.controller.place
 
-import com.ctr.homestaybooking.controller.place.dto.PlaceDetailDto
-import com.ctr.homestaybooking.controller.place.dto.PlaceDto
-import com.ctr.homestaybooking.controller.place.dto.PlaceRequest
+import com.ctr.homestaybooking.controller.place.dto.Place
+import com.ctr.homestaybooking.controller.place.dto.PlaceBody
+import com.ctr.homestaybooking.controller.place.dto.PlaceDetail
 import com.ctr.homestaybooking.service.*
 import com.ctr.homestaybooking.shared.ROLE_ADMIN
 import com.ctr.homestaybooking.shared.ROLE_HOST
@@ -27,33 +27,33 @@ class PlaceController(private val placeService: PlaceService,
     fun getAllPlace(@RequestParam(defaultValue = "0") page: Int,
                     @RequestParam(defaultValue = "20") size: Int,
                     @RequestParam(defaultValue = "id") sortBy: String
-    ): ApiData<List<PlaceDto>> {
-        return ApiData(placeService.getAllPlace(page, size, sortBy).map { it.toPlaceDto() })
+    ): ApiData<List<Place>> {
+        return ApiData(placeService.getAllPlace(page, size, sortBy).map { it.toPlace() })
     }
 
     @GetMapping("/{id}")
-    fun getPlaceById(@PathVariable("id") id: Int): ApiData<PlaceDetailDto> {
-        return ApiData(placeService.getPlaceByID(id).toPlaceDetailDto())
+    fun getPlaceById(@PathVariable("id") id: Int): ApiData<PlaceDetail> {
+        return ApiData(placeService.getPlaceByID(id).toPlaceDetail())
     }
 
     @GetMapping("/ward/{id}")
-    fun getPlacesByWardId(@PathVariable("id") id: Int): ApiData<List<PlaceDto>> {
-        return ApiData(placeService.getPlacesByWardEntity(locationService.getWardById(id)).map { it.toPlaceDto() })
+    fun getPlacesByWardId(@PathVariable("id") id: Int): ApiData<List<Place>> {
+        return ApiData(placeService.getPlacesByWardEntity(locationService.getWardById(id)).map { it.toPlace() })
     }
 
     @GetMapping("/district/{id}")
-    fun getPlacesByDistrictId(@PathVariable("id") id: Int): ApiData<List<PlaceDto>> {
-        return ApiData(placeService.getPlacesByDistrictId(id).map { it.toPlaceDto() })
+    fun getPlacesByDistrictId(@PathVariable("id") id: Int): ApiData<List<Place>> {
+        return ApiData(placeService.getPlacesByDistrictId(id).map { it.toPlace() })
     }
 
     @PostMapping
-    fun addPlace(@RequestBody @Validated placeRequest: PlaceRequest): ApiData<PlaceDetailDto> {
-        return ApiData(placeService.addPlace(placeRequest.toPlaceEntity(userService, locationService, placeTypeService, amenityService)).toPlaceDetailDto())
+    fun addPlace(@RequestBody @Validated placeBody: PlaceBody): ApiData<PlaceDetail> {
+        return ApiData(placeService.addPlace(placeBody.toPlaceEntity(userService, locationService, placeTypeService, amenityService)).toPlaceDetail())
     }
 
     @PutMapping
-    fun editPlace(@RequestBody @Validated placeRequest: PlaceRequest): ApiData<PlaceDetailDto> {
-        return ApiData(placeService.editPlace(placeRequest.toPlaceEntity(userService, locationService, placeTypeService, amenityService)).toPlaceDetailDto())
+    fun editPlace(@RequestBody @Validated placeBody: PlaceBody): ApiData<PlaceDetail> {
+        return ApiData(placeService.editPlace(placeBody.toPlaceEntity(userService, locationService, placeTypeService, amenityService)).toPlaceDetail())
     }
 
     @Secured(ROLE_ADMIN, ROLE_HOST)

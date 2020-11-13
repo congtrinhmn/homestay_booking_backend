@@ -22,11 +22,11 @@ class ProvinceEntity(
         @OneToMany(mappedBy = "provinceEntity")
         var districtEntities: List<DistrictEntity>? = null
 ) {
-    fun toProvinceResponse() = ProvinceDto(id, type, name)
+    fun toProvince() = Province(id, type, name)
 
-    fun toProvinceDetailResponse() = ProvinceDetailDto(id, type, name, districtEntities?.map { it.toDistrictDto() })
+    fun toProvinceDetail() = ProvinceDetail(id, type, name, districtEntities?.map { it.toDistrict() })
 }
 
-data class ProvinceDto(var id: Int = 0, var type: String, var name: String)
+data class Province(var id: Int = 0, var type: String, var name: String)
 
-data class ProvinceDetailDto(var id: Int = 0, var type: String, var name: String, var districts: List<DistrictDto>?)
+data class ProvinceDetail(var id: Int = 0, var type: String, var name: String, var districts: List<District>?)

@@ -5,6 +5,7 @@ import com.ctr.homestaybooking.controller.booking.ConflictException
 import com.ctr.homestaybooking.entity.BookingEntity
 import com.ctr.homestaybooking.repository.BookingRepository
 import com.ctr.homestaybooking.shared.*
+import com.ctr.homestaybooking.shared.enums.BookingStatus
 import com.ctr.homestaybooking.shared.enums.DateStatus
 import org.springframework.stereotype.Service
 import java.util.*
@@ -15,10 +16,12 @@ import java.util.*
 @Service
 class BookingService(private val bookingRepository: BookingRepository,
                      private val placeService: PlaceService,
-                     private val promoService: PromoService
+                     private val userService: UserService
 ) {
 
     fun getAllBooking() = bookingRepository.findAll().filterIsInstance<BookingEntity>()
+
+    fun getBookingByUserId(id: Int) = bookingRepository.findByUserEntity(userService.getUserById(id))
 
     fun getBookingById(id: Int) = bookingRepository.findById(id).toNullable()
             ?: throw BookingNotFoundException(id)
@@ -35,7 +38,8 @@ class BookingService(private val bookingRepository: BookingRepository,
             // check booking dates is available
             val bookingDates = startDate.datesUntil(endDate)
             placeService.getPlaceByID(bookingEntity.placeEntity.id).let { place ->
-                val availableDates = place.bookingSlotEntities.filter { it.status == DateStatus.AVAILABLE }.map { it.date }
+                val availableDates = place.bookingSlotEntities?.filter { it.status == DateStatus.AVAILABLE }?.map { it.date }
+                        ?: listOf()
                 if (!availableDates.isContainAll(bookingDates)) {
                     throw ConflictException("Booking dates is unavailable")
                 }
@@ -53,7 +57,6 @@ class BookingService(private val bookingRepository: BookingRepository,
                             throw ConflictException("Promo code is expired")
                         }
                     }
-
                 }
             }
             return bookingRepository.save(bookingEntity).apply {
@@ -67,6 +70,12 @@ class BookingService(private val bookingRepository: BookingRepository,
         if (bookingRepository.findById(bookingEntity.id).toNullable() == null)
             throw BookingNotFoundException(bookingEntity.id)
 
+        return bookingRepository.save(bookingEntity)
+    }
+
+    fun changeBookingStatus(id: Int, bookingStatus: BookingStatus): BookingEntity {
+        val bookingEntity = bookingRepository.findById(id).toNullable() ?: throw BookingNotFoundException(id)
+        bookingEntity.bookingStatus = bookingStatus
         return bookingRepository.save(bookingEntity)
     }
 

@@ -44,13 +44,17 @@ class PlaceService(private val placeRepository: PlaceRepository,
             placeRepository.findByDistrictId(id) ?: throw  NotFoundException("District", id)
 
     fun addPlace(placeEntity: PlaceEntity): PlaceEntity {
+        placeEntity.id = 0
         return placeRepository.save(placeEntity)
     }
 
     fun editPlace(placeEntity: PlaceEntity): PlaceEntity {
-        if (placeRepository.findById(placeEntity.id).toNullable() == null)
-            throw PlaceNotFoundException(placeEntity.id)
-
+        (placeRepository.findById(placeEntity.id).toNullable()
+                ?: throw PlaceNotFoundException(placeEntity.id)).apply {
+            placeEntity.let {
+                it.reviewEntities = reviewEntities
+            }
+        }
         return placeRepository.save(placeEntity)
     }
 
@@ -63,7 +67,7 @@ class PlaceService(private val placeRepository: PlaceRepository,
 
     fun updateBookingSlotById(id: Int, bookingDates: Set<Date>): PlaceEntity {
         val placeEntity = placeRepository.findById(id).toNullable() ?: throw PlaceNotFoundException(id)
-        placeEntity.bookingSlotEntities.apply {
+        placeEntity.bookingSlotEntities?.apply {
             val dates = map { it.date }
             // add booking date if bookingSlots don't have
             bookingDates.forEach {

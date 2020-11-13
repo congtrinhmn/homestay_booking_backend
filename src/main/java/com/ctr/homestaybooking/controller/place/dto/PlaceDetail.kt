@@ -11,7 +11,7 @@ import java.util.*
  * Created by at-trinhnguyen2 on 2020/10/26
  */
 
-data class PlaceDetailDto(
+data class PlaceDetail(
 
         var id: Int = 0,
 
@@ -49,27 +49,27 @@ data class PlaceDetailDto(
 
         var checkOutTime: Date?,
 
-        var submitStatus: SubmitStatus = SubmitStatus.DRAFT,
+        var submitStatus: SubmitStatus?,
 
-        var status: PlaceStatus = PlaceStatus.UNLISTED,
+        var status: PlaceStatus?,
 
-        var images: Set<String>?,
+        var images: List<String>?,
 
-        var amenities: Set<AmenityEntity>?,
+        var amenities: List<Int>?,
 
-        var bookingSlots: Set<BookingSlotEntity>,
+        var bookingSlots: List<BookingSlot>?,
 
-        var hostDetail: UserDetailDto?,
+        var hostDetail: UserDetail?,
 
-        var wardDetailDto: WardDetailDto?,
+        var wardDetail: WardDetail?,
 
-        var placeTypeId: Int?,
+        var placeType: String?,
 
-        var promos: Set<PromoDto>?,
+        var promos: List<Promo>?,
 
-        var reviews: Set<ReviewDto>?,
+        var reviews: List<Review>?,
 
         var rateCount: Int = 0,
 
-        var rateAverage: String = "0.0"
+        var rateAverage: Double = 0.0
 )

@@ -60,12 +60,12 @@ class UserEntity(
         @Enumerated(EnumType.STRING)
         var status: UserStatus = UserStatus.ACTIVE
 ) {
-        fun toUserDetailDto(): UserDetailDto {
-                return UserDetailDto(id, email, uuid, deviceToken, roleEntities.map { it.name }.toSet(), imageUrl, firstName, lastName, gender, birthday, phoneNumber)
+        fun toUserDetail(): UserDetail {
+                return UserDetail(id, email, uuid, deviceToken, roleEntities.map { it.name }.toSet(), imageUrl, firstName, lastName, gender, birthday, phoneNumber)
         }
 }
 
-data class UserDetailDto(
+data class UserDetail(
         val id: Int,
         val email: String,
         val uuid: String,

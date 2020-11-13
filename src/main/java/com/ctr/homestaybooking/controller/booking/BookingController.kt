@@ -1,12 +1,13 @@
 package com.ctr.homestaybooking.controller.booking
 
-import com.ctr.homestaybooking.entity.BookingDetailDto
-import com.ctr.homestaybooking.entity.BookingRequest
+import com.ctr.homestaybooking.entity.BookingBody
+import com.ctr.homestaybooking.entity.BookingDetail
 import com.ctr.homestaybooking.service.BookingService
 import com.ctr.homestaybooking.service.PlaceService
 import com.ctr.homestaybooking.service.PromoService
 import com.ctr.homestaybooking.service.UserService
 import com.ctr.homestaybooking.shared.ROLE_ADMIN
+import com.ctr.homestaybooking.shared.enums.BookingStatus
 import com.ctr.homestaybooking.shared.model.ApiData
 import org.springframework.security.access.annotation.Secured
 import org.springframework.validation.annotation.Validated
@@ -24,27 +25,37 @@ class BookingController(private val bookingService: BookingService,
                         private val promoService: PromoService
 ) {
     @get:GetMapping
-    val allBooking: ApiData<List<BookingDetailDto>>
-        get() = ApiData(bookingService.getAllBooking().map { it.toBookingDetailDto() })
+    val allBooking: ApiData<List<BookingDetail>>
+        get() = ApiData(bookingService.getAllBooking().map { it.toBookingDetail() })
 
     @GetMapping("/{id}")
-    fun getBookingById(@PathVariable("id") id: Int): ApiData<BookingDetailDto> {
-        return ApiData(bookingService.getBookingById(id).toBookingDetailDto())
+    fun getBookingById(@PathVariable("id") id: Int): ApiData<BookingDetail> {
+        return ApiData(bookingService.getBookingById(id).toBookingDetail())
+    }
+
+    @GetMapping("/user/{id}")
+    fun getBookingByUserId(@PathVariable("id") id: Int): ApiData<List<BookingDetail>> {
+        return ApiData(bookingService.getBookingByUserId(id).map { it.toBookingDetail() })
     }
 
     @PostMapping
-    fun addBooking(@RequestBody @Validated bookingRequest: BookingRequest): ApiData<BookingDetailDto> {
-        return ApiData(bookingService.addBooking(bookingRequest.toBookingEntity(placeService, userService, promoService)).toBookingDetailDto())
+    fun addBooking(@RequestBody @Validated bookingBody: BookingBody): ApiData<BookingDetail> {
+        return ApiData(bookingService.addBooking(bookingBody.toBookingEntity(placeService, userService, promoService)).toBookingDetail())
     }
 
     @PutMapping
-    fun editBooking(@RequestBody @Validated bookingRequest: BookingRequest): ApiData<BookingDetailDto> {
-        return ApiData(bookingService.editBooking(bookingRequest.toBookingEntity(placeService, userService, promoService)).toBookingDetailDto())
+    fun editBooking(@RequestBody @Validated bookingBody: BookingBody): ApiData<BookingDetail> {
+        return ApiData(bookingService.editBooking(bookingBody.toBookingEntity(placeService, userService, promoService)).toBookingDetail())
     }
 
     @Secured(ROLE_ADMIN)
     @DeleteMapping("/{id}")
     fun deleteBooking(@PathVariable("id") id: Int) {
         bookingService.deleteBookingByID(id)
+    }
+
+    @PutMapping("/{id}")
+    fun changeBookingStatus(@PathVariable("id") id: Int, bookingStatus: BookingStatus): ApiData<BookingDetail> {
+        return ApiData(bookingService.changeBookingStatus(id, bookingStatus).toBookingDetail())
     }
 }

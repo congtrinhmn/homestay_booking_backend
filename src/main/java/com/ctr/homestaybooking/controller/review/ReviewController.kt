@@ -1,7 +1,7 @@
 package com.ctr.homestaybooking.controller.review
 
-import com.ctr.homestaybooking.entity.ReviewDto
-import com.ctr.homestaybooking.entity.ReviewRequest
+import com.ctr.homestaybooking.entity.Review
+import com.ctr.homestaybooking.entity.ReviewBody
 import com.ctr.homestaybooking.service.BookingService
 import com.ctr.homestaybooking.service.PlaceService
 import com.ctr.homestaybooking.service.ReviewService
@@ -23,22 +23,22 @@ class ReviewController(private val reviewService: ReviewService,
                        private val bookingService: BookingService
 ) {
     @get:GetMapping
-    val allReviewDetail: ApiData<List<ReviewDto>>
-        get() = ApiData(reviewService.getAllReview().map { it.toReviewDto() })
+    val allReviewDetail: ApiData<List<Review>>
+        get() = ApiData(reviewService.getAllReview().map { it.toReview() })
 
     @GetMapping("/{id}")
-    fun getReviewById(@PathVariable("id") id: Int): ApiData<ReviewDto> {
-        return ApiData(reviewService.getReviewById(id).toReviewDto())
+    fun getReviewById(@PathVariable("id") id: Int): ApiData<Review> {
+        return ApiData(reviewService.getReviewById(id).toReview())
     }
 
     @PostMapping
-    fun addReview(@RequestBody @Validated reviewRequest: ReviewRequest): ApiData<ReviewDto> {
-        return ApiData(reviewService.addReview(reviewRequest.toReviewEntity(userService, placeService, bookingService)).toReviewDto())
+    fun addReview(@RequestBody @Validated reviewBody: ReviewBody): ApiData<Review> {
+        return ApiData(reviewService.addReview(reviewBody.toReviewEntity(userService, placeService, bookingService)).toReview())
     }
 
     @PutMapping
-    fun editReview(@RequestBody @Validated reviewRequest: ReviewRequest): ApiData<ReviewDto> {
-        return ApiData(reviewService.editReview(reviewRequest.toReviewEntity(userService, placeService, bookingService)).toReviewDto())
+    fun editReview(@RequestBody @Validated reviewBody: ReviewBody): ApiData<Review> {
+        return ApiData(reviewService.editReview(reviewBody.toReviewEntity(userService, placeService, bookingService)).toReview())
     }
 
     @Secured(ROLE_ADMIN)

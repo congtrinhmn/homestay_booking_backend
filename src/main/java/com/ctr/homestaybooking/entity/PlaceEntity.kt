@@ -1,13 +1,12 @@
 package com.ctr.homestaybooking.entity
 
-import com.ctr.homestaybooking.controller.place.dto.PlaceDetailDto
-import com.ctr.homestaybooking.controller.place.dto.PlaceDto
-import com.ctr.homestaybooking.shared.FORMAT_TIME
+import com.ctr.homestaybooking.controller.place.dto.Place
+import com.ctr.homestaybooking.controller.place.dto.PlaceDetail
+import com.ctr.homestaybooking.shared.FORMAT_DATE_TIME
 import com.ctr.homestaybooking.shared.enums.BookingType
 import com.ctr.homestaybooking.shared.enums.CancelType
 import com.ctr.homestaybooking.shared.enums.PlaceStatus
 import com.ctr.homestaybooking.shared.enums.SubmitStatus
-import com.ctr.homestaybooking.shared.format
 import org.springframework.format.annotation.DateTimeFormat
 import java.util.*
 import javax.persistence.*
@@ -27,6 +26,7 @@ class PlaceEntity(
         @NotNull
         var name: String?,
 
+        @Column(columnDefinition = "text")
         var description: String?,
 
         var bookingType: BookingType?,
@@ -54,23 +54,23 @@ class PlaceEntity(
         @Enumerated(EnumType.STRING)
         var cancelType: CancelType?,
 
-        @Temporal(TemporalType.TIME)
-        @DateTimeFormat(pattern = FORMAT_TIME)
+        @Temporal(TemporalType.TIMESTAMP)
+        @DateTimeFormat(pattern = FORMAT_DATE_TIME)
         var earliestCheckInTime: Date?,
 
-        @Temporal(TemporalType.TIME)
-        @DateTimeFormat(pattern = FORMAT_TIME)
+        @Temporal(TemporalType.TIMESTAMP)
+        @DateTimeFormat(pattern = FORMAT_DATE_TIME)
         var latestCheckInTime: Date?,
 
-        @Temporal(TemporalType.TIME)
-        @DateTimeFormat(pattern = FORMAT_TIME)
+        @Temporal(TemporalType.TIMESTAMP)
+        @DateTimeFormat(pattern = FORMAT_DATE_TIME)
         var checkOutTime: Date?,
 
         @Enumerated(EnumType.STRING)
-        var submitStatus: SubmitStatus = SubmitStatus.DRAFT,
+        var submitStatus: SubmitStatus?,
 
         @Enumerated(EnumType.STRING)
-        var status: PlaceStatus = PlaceStatus.UNLISTED,
+        var status: PlaceStatus?,
 
         @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true)
         var imageEntities: Set<ImageEntity>?,
@@ -84,7 +84,7 @@ class PlaceEntity(
 
         @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true)
         @JoinColumn(name = "place_id")
-        var bookingSlotEntities: MutableSet<BookingSlotEntity>,
+        var bookingSlotEntities: MutableSet<BookingSlotEntity>?,
 
         @ManyToOne
         @JoinColumn(name = "host_id")
@@ -111,7 +111,7 @@ class PlaceEntity(
         }
     }
 
-    fun toPlaceDto() = PlaceDto(
+    fun toPlace() = Place(
             id = id,
             name = name,
             description = description,
@@ -124,13 +124,14 @@ class PlaceEntity(
             bathroomCount = bathroomCount,
             size = size,
             pricePerDay = pricePerDay,
-            images = imageEntities?.map { it.url }?.toSet(),
+            images = imageEntities?.sortedBy { it.id }?.map { it.url },
+            placeType = placeTypeEntity?.name,
             rateCount = reviewEntities?.size ?: 0,
-            rateAverage = reviewEntities?.let { reviews -> reviews.sumBy { it.rating }.toDouble().div(reviews.size) }
+            rateAverage = if (reviewEntities.isNullOrEmpty()) 0.0 else reviewEntities?.let { reviews -> reviews.sumBy { it.rating }.toDouble().div(reviews.size) }
                     ?: 0.0
     )
 
-    fun toPlaceDetailDto() = PlaceDetailDto(
+    fun toPlaceDetail() = PlaceDetail(
             id = id,
             name = name,
             description = description,
@@ -150,20 +151,21 @@ class PlaceEntity(
             latestCheckInTime = latestCheckInTime,
             checkOutTime = checkOutTime,
             submitStatus = submitStatus,
-            images = imageEntities?.map { it.url }?.toSet(),
-            amenities = amenityEntities,
-            bookingSlots = bookingSlotEntities,
-            hostDetail = userEntity?.toUserDetailDto(),
-            wardDetailDto = wardEntity?.toWardDetailDto(),
-            placeTypeId = placeTypeEntity?.id,
+            status = status,
+            images = imageEntities?.sortedBy { it.id }?.map { it.url },
+            amenities = amenityEntities?.sortedBy { it.id }?.map { it.id },
+            bookingSlots = bookingSlotEntities?.sortedBy { it.date }?.map { it.toBookingSlot() },
+            hostDetail = userEntity?.toUserDetail(),
+            wardDetail = wardEntity?.toWardDetail(),
+            placeType = placeTypeEntity?.name,
             promos = promoEntities?.filter { it.startDate.before(Date()) && it.endDate.after(Date()) }
-                    ?.map { it.toPromoDto() }
-                    ?.toSet(),
-            reviews = reviewEntities?.map { it.toReviewDto() }?.toSet(),
+                    ?.sortedBy { it.discountPercent }
+                    ?.map { it.toPromo() },
+            reviews = reviewEntities?.map { it.toReview() },
             rateCount = reviewEntities?.size ?: 0,
-            rateAverage = reviewEntities?.let { reviews -> reviews.sumBy { it.rating }.toDouble().div(reviews.size) }?.format(2)
-                    ?: "0.0"
+            rateAverage = if (reviewEntities.isNullOrEmpty()) 0.0 else reviewEntities?.let { reviews -> reviews.sumBy { it.rating }.toDouble().div(reviews.size) }
+                    ?: 0.0
     )
 
-    override fun toString() = toPlaceDetailDto().toString()
+    override fun toString() = toPlaceDetail().toString()
 }

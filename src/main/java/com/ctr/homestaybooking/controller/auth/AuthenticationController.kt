@@ -25,7 +25,7 @@ class AuthenticationController(private val authenticationManager: Authentication
     @PostMapping("/register")
     @ResponseStatus(value = HttpStatus.CREATED)
     fun register(@RequestBody @Validated userRequest: UserRequest): ResponseEntity<AuthToken> {
-        userService.addUser(userRequest.toUserEntity()).toUserDetailDto().apply {
+        userService.addUser(userRequest.toUserEntity()).toUserDetail().apply {
             val authentication = authenticationManager.authenticate(
                     UsernamePasswordAuthenticationToken(
                             userRequest.email,
@@ -51,7 +51,7 @@ class AuthenticationController(private val authenticationManager: Authentication
                 )
                 SecurityContextHolder.getContext().authentication = authentication
                 val token = jwtTokenUtil.generateToken(authentication)
-                ResponseEntity.ok(AuthToken(userService.getUserByEmail(login.email).toUserDetailDto(), token))
+                ResponseEntity.ok(AuthToken(userService.getUserByEmail(login.email).toUserDetail(), token))
             } catch (e: Exception) {
                 throw PasswordLoginFailedException()
             }
@@ -73,7 +73,7 @@ class AuthenticationController(private val authenticationManager: Authentication
                         )
                 )
                 SecurityContextHolder.getContext().authentication = authentication
-                ResponseEntity.ok(AuthToken(userService.getUserByEmail(email).toUserDetailDto(), token))
+                ResponseEntity.ok(AuthToken(userService.getUserByEmail(email).toUserDetail(), token))
             } catch (e: Exception) {
                 throw PasswordLoginFailedException()
             }

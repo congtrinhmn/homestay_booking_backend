@@ -1,6 +1,6 @@
 package com.ctr.homestaybooking.entity
 
-import com.ctr.homestaybooking.controller.place.dto.PlaceDetailDto
+import com.ctr.homestaybooking.controller.place.dto.PlaceDetail
 import com.ctr.homestaybooking.service.BookingService
 import com.ctr.homestaybooking.service.PlaceService
 import com.ctr.homestaybooking.service.UserService
@@ -20,6 +20,7 @@ class ReviewEntity(
         @GeneratedValue(strategy = GenerationType.IDENTITY)
         var id: Int = 0,
 
+        @Column(columnDefinition = "text")
         var comment: String,
 
         var rating: Int,
@@ -43,27 +44,28 @@ class ReviewEntity(
         @JoinColumn(name = "booking_id", unique = true)
         var bookingEntity: BookingEntity? = null
 ) {
-    fun toReviewDto() = ReviewDto(id, comment, rating, createDate, userEntity.toUserDetailDto())
+    fun toReview() = Review(id, comment, rating, createDate, userEntity.imageUrl, "${userEntity.lastName} ${userEntity.firstName}")
 
-    fun toReviewDetailDto() = ReviewDetailDto(id, comment, rating, createDate, userEntity.toUserDetailDto(), placeEntity?.toPlaceDetailDto(), bookingEntity?.toBookingDetailDto())
+    fun toReviewDetail() = ReviewDetail(id, comment, rating, createDate, userEntity.toUserDetail(), placeEntity?.toPlaceDetail(), bookingEntity?.toBookingDetail())
 }
 
-data class ReviewDto(var id: Int,
-                     var comment: String,
-                     var rating: Int,
-                     var createDate: Date,
-                     var user: UserDetailDto
+data class Review(var id: Int,
+                  var comment: String,
+                  var rating: Int,
+                  var createDate: Date,
+                  var userImage: String,
+                  var userName: String
 )
 
-data class ReviewDetailDto(var id: Int,
-                           var comment: String,
-                           var rating: Int,
-                           var createDate: Date,
-                           var user: UserDetailDto,
-                           var place: PlaceDetailDto?,
-                           var booking: BookingDetailDto?)
+data class ReviewDetail(var id: Int,
+                        var comment: String,
+                        var rating: Int,
+                        var createDate: Date,
+                        var user: UserDetail,
+                        var place: PlaceDetail?,
+                        var booking: BookingDetail?)
 
-data class ReviewRequest(
+data class ReviewBody(
         var id: Int,
         var comment: String,
         var rating: Int,

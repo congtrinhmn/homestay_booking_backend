@@ -2,6 +2,7 @@ package com.ctr.homestaybooking.config
 
 import com.ctr.homestaybooking.entity.*
 import com.ctr.homestaybooking.repository.*
+import com.ctr.homestaybooking.shared.enums.Amenity
 import com.ctr.homestaybooking.shared.enums.Gender
 import com.ctr.homestaybooking.shared.enums.Role
 import com.ctr.homestaybooking.shared.enums.UserStatus
@@ -34,7 +35,7 @@ class DataSeedingListener(private val userRepository: UserRepository,
         Role.values().forEach { addRoleIfMissing(it) }
         addUserIfMissing()
         addProvinceIfMissing()
-        amenities.forEach { addAmenityIfMissing(it) }
+        Amenity.values().forEach { addAmenityIfMissing(it) }
         placeTypes.forEach { addPlaceTypeIfMissing(it) }
 
         if (signingKey == null || signingKey.isEmpty()) {
@@ -45,29 +46,6 @@ class DataSeedingListener(private val userRepository: UserRepository,
             println("jwt-key=$jws")
         }
     }
-
-    private val amenities = setOf(
-            "Wifi",
-            "Internet",
-            "TV",
-            "Điều hòa",
-            "Quạt",
-            "Máy sấy",
-            "Bình nóng lạnh",
-            "Máy giặt",
-            "Dầu gội, đầu xả",
-            "Giấy vệ sinh",
-            "Khăn tắm",
-            "Kem đánh răng",
-            "Xà phòng tắm",
-            "Interner",
-            "Bếp điện",
-            "Lò vi sóng",
-            "Tủ lạnh",
-            "Ban Công",
-            "Cửa sổ",
-            "Bể bơi cá nhân"
-    )
 
     private val placeTypes = setOf(
             "Homestay",
@@ -121,9 +99,9 @@ class DataSeedingListener(private val userRepository: UserRepository,
         }
     }
 
-    private fun addAmenityIfMissing(name: String) {
-        if (amenityRepository.findByName(name) == null) {
-            amenityRepository.save(AmenityEntity(name = name))
+    private fun addAmenityIfMissing(amenity: Amenity) {
+        if (amenityRepository.findByName(amenity.amenityName) == null) {
+            amenityRepository.save(AmenityEntity(id = amenity.id, name = amenity.amenityName))
         }
     }
 

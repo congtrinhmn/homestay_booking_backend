@@ -1,6 +1,6 @@
 package com.ctr.homestaybooking.entity
 
-import com.ctr.homestaybooking.controller.place.dto.PlaceDetailDto
+import com.ctr.homestaybooking.controller.place.dto.PlaceDetail
 import com.ctr.homestaybooking.service.PlaceService
 import com.ctr.homestaybooking.service.PromoService
 import com.ctr.homestaybooking.service.UserService
@@ -67,7 +67,7 @@ class BookingEntity(
         @OneToOne(mappedBy = "bookingEntity")
         var reviewEntity: ReviewEntity? = null
 ) {
-    fun toBookingDetailDto() = BookingDetailDto(
+    fun toBookingDetail() = BookingDetail(
             id = id,
             createDate = createDate,
             startDate = startDate,
@@ -79,17 +79,17 @@ class BookingEntity(
             cancerDate = cancerDate,
             isRefund = isRefund,
             refundPaid = refundPaid,
-            bookingStatus = bookingStatus,
-            place = placeEntity.toPlaceDetailDto(),
-            user = userEntity.toUserDetailDto(),
-            promo = promoEntity?.toPromoDto(),
-            reviewEntity = reviewEntity
+            status = bookingStatus,
+            place = placeEntity.toPlaceDetail(),
+            user = userEntity.toUserDetail(),
+            promo = promoEntity?.toPromo(),
+            review = reviewEntity?.toReview()
     )
 
-    override fun toString() = toBookingDetailDto().toString()
+    override fun toString() = toBookingDetail().toString()
 }
 
-data class BookingDetailDto(
+data class BookingDetail(
         var id: Int,
         var createDate: Date,
         var startDate: Date,
@@ -101,31 +101,29 @@ data class BookingDetailDto(
         var cancerDate: Date?,
         var isRefund: Boolean? = false,
         var refundPaid: Double?,
-        var bookingStatus: BookingStatus,
-        var place: PlaceDetailDto,
-        var user: UserDetailDto,
-        var promo: PromoDto?,
-        var reviewEntity: ReviewEntity?
+        var status: BookingStatus,
+        var place: PlaceDetail,
+        var user: UserDetail,
+        var promo: Promo?,
+        var review: Review?
 )
 
-
-data class BookingRequest(
+data class BookingBody(
         var id: Int,
-        var createDate: Date,
         var startDate: Date,
         var endDate: Date,
         var pricePerDay: Double,
         var priceForStay: Double,
         var taxPaid: Double,
         var totalPaid: Double,
-        var bookingStatus: BookingStatus,
+        var status: BookingStatus,
         var placeId: Int,
         var userId: Int,
         var promoId: Int?
 ) {
     fun toBookingEntity(placeService: PlaceService, userService: UserService, promoService: PromoService) = BookingEntity(
             id = id,
-            createDate = createDate,
+            createDate = Date(),
             startDate = startDate,
             endDate = endDate,
             pricePerDay = pricePerDay,
@@ -135,7 +133,7 @@ data class BookingRequest(
             cancerDate = null,
             isRefund = false,
             refundPaid = null,
-            bookingStatus = bookingStatus,
+            bookingStatus = status,
             placeEntity = placeService.getPlaceByID(placeId),
             userEntity = userService.getUserById(userId),
             promoEntity = promoId?.let { promoService.getPromoById(it) }

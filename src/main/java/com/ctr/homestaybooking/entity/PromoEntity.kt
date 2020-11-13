@@ -1,6 +1,6 @@
 package com.ctr.homestaybooking.entity
 
-import com.ctr.homestaybooking.controller.place.dto.PlaceDto
+import com.ctr.homestaybooking.controller.place.dto.Place
 import com.ctr.homestaybooking.service.PlaceService
 import com.ctr.homestaybooking.shared.FORMAT_DATE_TIME
 import org.springframework.format.annotation.DateTimeFormat
@@ -26,14 +26,17 @@ class PromoEntity(
         @NotNull
         var description: String = "",
 
+        @NotNull
         @Temporal(TemporalType.TIMESTAMP)
         @DateTimeFormat(pattern = FORMAT_DATE_TIME)
         var createDate: Date,
 
+        @NotNull
         @Temporal(TemporalType.TIMESTAMP)
         @DateTimeFormat(pattern = FORMAT_DATE_TIME)
         var startDate: Date,
 
+        @NotNull
         @Temporal(TemporalType.TIMESTAMP)
         @DateTimeFormat(pattern = FORMAT_DATE_TIME)
         var endDate: Date,
@@ -49,7 +52,7 @@ class PromoEntity(
         var placeEntities: MutableSet<PlaceEntity>
 ) {
 
-    fun toPromoDto() = PromoDto(
+    fun toPromo() = Promo(
             id = id,
             name = name,
             description = description,
@@ -60,7 +63,7 @@ class PromoEntity(
             discountPercent = discountPercent
     )
 
-    fun toPromoDetailDto() = PromoDetailDto(
+    fun toPromoDetail() = PromoDetail(
             id = id,
             name = name,
             description = description,
@@ -69,11 +72,11 @@ class PromoEntity(
             endDate = endDate,
             discount = discount,
             discountPercent = discountPercent,
-            places = placeEntities.map { it.toPlaceDto() }.toSet()
+            places = placeEntities.map { it.toPlace() }.toSet()
     )
 }
 
-data class PromoDto(
+data class Promo(
         var id: Int,
         var name: String,
         var description: String = "",
@@ -84,7 +87,7 @@ data class PromoDto(
         var discountPercent: Double?
 )
 
-data class PromoDetailDto(
+data class PromoDetail(
         var id: Int,
         var name: String,
         var description: String = "",
@@ -93,10 +96,10 @@ data class PromoDetailDto(
         var endDate: Date,
         var discount: Double?,
         var discountPercent: Double?,
-        var places: Set<PlaceDto>?
+        var places: Set<Place>?
 )
 
-data class PromoRequest(
+data class PromoBody(
         var id: Int = 0,
         var name: String,
         var description: String = "",
