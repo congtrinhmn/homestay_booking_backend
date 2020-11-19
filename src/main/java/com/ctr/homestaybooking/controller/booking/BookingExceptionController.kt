@@ -32,6 +32,11 @@ class BookingExceptionController {
     fun exception(exception: BookingIsNotExistsException): ResponseEntity<Any> {
         return Response.buildResponseError(ApiError(HttpStatus.BAD_GATEWAY, exception))
     }
+
+    @ExceptionHandler(value = [MethodNotAllowedException::class])
+    fun exception(exception: MethodNotAllowedException): ResponseEntity<Any> {
+        return Response.buildResponseError(ApiError(HttpStatus.METHOD_NOT_ALLOWED, exception))
+    }
 }
 
 class BookingNotFoundException(id: Int) : RuntimeException("Booking id not found : $id")
@@ -39,5 +44,7 @@ class BookingNotFoundException(id: Int) : RuntimeException("Booking id not found
 class BookingIsExistsException(id: Int) : RuntimeException("Booking is exist with id: $id")
 
 class BookingIsNotExistsException(id: Int) : RuntimeException("Booking is not exist with id: $id")
+
+class MethodNotAllowedException : RuntimeException("Method not allowed")
 
 class ConflictException(message: String?) : RuntimeException(message)

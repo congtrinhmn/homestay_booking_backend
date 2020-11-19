@@ -2,11 +2,15 @@ package com.ctr.homestaybooking.service
 
 import com.ctr.homestaybooking.controller.booking.BookingNotFoundException
 import com.ctr.homestaybooking.controller.booking.ConflictException
+import com.ctr.homestaybooking.controller.booking.MethodNotAllowedException
 import com.ctr.homestaybooking.entity.BookingEntity
 import com.ctr.homestaybooking.repository.BookingRepository
 import com.ctr.homestaybooking.shared.*
 import com.ctr.homestaybooking.shared.enums.BookingStatus
 import com.ctr.homestaybooking.shared.enums.DateStatus
+import com.mservice.allinone.models.CaptureMoMoResponse
+import com.mservice.allinone.processor.allinone.CaptureMoMo
+import com.mservice.shared.sharedmodels.Environment
 import org.springframework.stereotype.Service
 import java.util.*
 
@@ -73,9 +77,33 @@ class BookingService(private val bookingRepository: BookingRepository,
         return bookingRepository.save(bookingEntity)
     }
 
+    fun requestPayment(id: Int): CaptureMoMoResponse {
+        val extraData = "merchantName=HomestayBooking"
+        val bookingEntity = bookingRepository.findById(id).toNullable() ?: throw BookingNotFoundException(id)
+        bookingEntity.apply {
+            val environment = Environment.selectEnv(Environment.EnvTarget.DEV, Environment.ProcessType.PAY_GATE)
+            return CaptureMoMo.process(
+                    environment,
+                    id.toString(),
+                    id.toString(),
+                    totalPaid.toInt().toString(),
+                    placeEntity.name,
+                    "homestay://payment/booking/$id",
+                    "http://localhost:8080/api/bookings/11/paid",
+                    extraData)
+        }
+    }
+
     fun changeBookingStatus(id: Int, bookingStatus: BookingStatus): BookingEntity {
         val bookingEntity = bookingRepository.findById(id).toNullable() ?: throw BookingNotFoundException(id)
+        if (bookingStatus == BookingStatus.PAID) throw MethodNotAllowedException()
         bookingEntity.bookingStatus = bookingStatus
+        return bookingRepository.save(bookingEntity)
+    }
+
+    fun changeBookingStatusPaid(id: Int): BookingEntity {
+        val bookingEntity = bookingRepository.findById(id).toNullable() ?: throw BookingNotFoundException(id)
+        bookingEntity.bookingStatus = BookingStatus.PAID
         return bookingRepository.save(bookingEntity)
     }
 
