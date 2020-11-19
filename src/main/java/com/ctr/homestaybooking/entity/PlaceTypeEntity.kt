@@ -19,7 +19,7 @@ data class PlaceTypeEntity(
         @NotNull
         var description: String
 ) {
-    fun toPlaceTypeResponse() = PlaceTypeResponse(id, name, description)
+    fun toPlaceType() = PlaceType(id, name, description)
 }
 
-data class PlaceTypeResponse(var id: Int = 0, var name: String, var description: String = "")
+data class PlaceType(var id: Int = 0, var name: String, var description: String = "")

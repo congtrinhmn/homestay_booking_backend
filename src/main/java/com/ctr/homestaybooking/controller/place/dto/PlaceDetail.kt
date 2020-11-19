@@ -1,6 +1,5 @@
 package com.ctr.homestaybooking.controller.place.dto
 
-import com.ctr.homestaybooking.controller.user.dto.UserDetailResponse
 import com.ctr.homestaybooking.entity.*
 import com.ctr.homestaybooking.shared.enums.BookingType
 import com.ctr.homestaybooking.shared.enums.CancelType
@@ -12,7 +11,7 @@ import java.util.*
  * Created by at-trinhnguyen2 on 2020/10/26
  */
 
-data class PlaceDetailResponse(
+data class PlaceDetail(
 
         var id: Int = 0,
 
@@ -50,27 +49,27 @@ data class PlaceDetailResponse(
 
         var checkOutTime: Date?,
 
-        var submitStatus: SubmitStatus = SubmitStatus.DRAFT,
+        var submitStatus: SubmitStatus?,
 
-        var status: PlaceStatus = PlaceStatus.UNLISTED,
+        var status: PlaceStatus?,
 
-        var images: Set<String>?,
+        var images: List<String>?,
 
-        var amenities: Set<AmenityEntity>?,
+        var amenities: List<Int>?,
 
-        var bookingSlots: Set<BookingSlotEntity>,
+        var bookingSlots: List<BookingSlot>?,
 
-        var hostDetail: UserDetailResponse?,
+        var hostDetail: UserDetail?,
 
-        var wardDetailResponse: WardDetailResponse?,
+        var wardDetail: WardDetail?,
 
-        var placeTypeId: Int?,
+        var placeType: String?,
 
-        var promos: Set<PromoResponse>?,
+        var promos: List<Promo>?,
 
-        var reviews: Set<ReviewResponse>?,
+        var reviews: List<Review>?,
 
         var rateCount: Int = 0,
 
-        var rateAverage: String = "0.0"
+        var rateAverage: Double = 0.0
 )

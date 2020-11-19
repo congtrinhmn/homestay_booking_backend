@@ -1,6 +1,5 @@
 package com.ctr.homestaybooking.entity
 
-import com.ctr.homestaybooking.controller.user.dto.UserDetailResponse
 import com.ctr.homestaybooking.shared.FORMAT_DATE
 import com.ctr.homestaybooking.shared.enums.Gender
 import com.ctr.homestaybooking.shared.enums.UserStatus
@@ -61,8 +60,22 @@ class UserEntity(
         @Enumerated(EnumType.STRING)
         var status: UserStatus = UserStatus.ACTIVE
 ) {
-    fun toUserDetailResponse(): UserDetailResponse {
-        return UserDetailResponse(id, email, uuid, deviceToken, roleEntities, imageUrl, firstName, lastName, gender, birthday, phoneNumber)
-    }
+        fun toUserDetail(): UserDetail {
+                return UserDetail(id, email, uuid, deviceToken, roleEntities.map { it.name }.toSet(), imageUrl, firstName, lastName, gender, birthday, phoneNumber)
+        }
 }
 
+data class UserDetail(
+        val id: Int,
+        val email: String,
+        val uuid: String,
+        val deviceToken: String,
+        val roles: Set<String>,
+        val imageUrl: String,
+        val firstName: String,
+        val lastName: String,
+        var gender: Gender,
+        val birthday: Date,
+        val phoneNumber: String,
+        val status: UserStatus = UserStatus.ACTIVE
+)

@@ -1,27 +1,31 @@
 package com.ctr.homestaybooking.controller.place.dto
 
+import com.ctr.homestaybooking.entity.BookingSlot
 import com.ctr.homestaybooking.entity.BookingSlotEntity
-import com.ctr.homestaybooking.entity.BookingSlotResponse
 import com.ctr.homestaybooking.entity.ImageEntity
 import com.ctr.homestaybooking.entity.PlaceEntity
 import com.ctr.homestaybooking.service.AmenityService
 import com.ctr.homestaybooking.service.LocationService
 import com.ctr.homestaybooking.service.PlaceTypeService
 import com.ctr.homestaybooking.service.UserService
+import com.ctr.homestaybooking.shared.FORMAT_DATE_TIME
 import com.ctr.homestaybooking.shared.enums.BookingType
 import com.ctr.homestaybooking.shared.enums.CancelType
 import com.ctr.homestaybooking.shared.enums.PlaceStatus
 import com.ctr.homestaybooking.shared.enums.SubmitStatus
+import org.springframework.format.annotation.DateTimeFormat
 import java.util.*
 import javax.persistence.EnumType
 import javax.persistence.Enumerated
+import javax.persistence.Temporal
+import javax.persistence.TemporalType
 import javax.validation.constraints.NotNull
 
 
 /**
  * Created by at-trinhnguyen2 on 2020/10/19
  */
-data class PlaceRequest(
+data class PlaceBody(
 
         var id: Int = 0,
 
@@ -54,10 +58,16 @@ data class PlaceRequest(
         @Enumerated(EnumType.STRING)
         var cancelType: CancelType?,
 
+        @Temporal(TemporalType.TIMESTAMP)
+        @DateTimeFormat(pattern = FORMAT_DATE_TIME)
         var earliestCheckInTime: Date?,
 
+        @Temporal(TemporalType.TIMESTAMP)
+        @DateTimeFormat(pattern = FORMAT_DATE_TIME)
         var latestCheckInTime: Date?,
 
+        @Temporal(TemporalType.TIMESTAMP)
+        @DateTimeFormat(pattern = FORMAT_DATE_TIME)
         var checkOutTime: Date?,
 
         @Enumerated(EnumType.STRING)
@@ -70,7 +80,7 @@ data class PlaceRequest(
 
         var amenities: List<Int>?,
 
-        var bookingSlots: Set<BookingSlotResponse>?,
+        var bookingSlots: Set<BookingSlot>?,
 
         @NotNull
         var userId: Int,
@@ -114,7 +124,7 @@ data class PlaceRequest(
             wardEntity = wardId?.let { locationService.getWardById(it) },
             placeTypeEntity = placeTypeId?.let { placeTypeService.getPlaceTypeById(it) },
             promoEntities = null,
-            reviewEntities = null
+            reviewEntities = setOf()
     )
 }
 

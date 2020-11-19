@@ -26,7 +26,7 @@ class BookingSlotEntity(
         @Enumerated(EnumType.STRING)
         var status: DateStatus = DateStatus.UNAVAILABLE
 ) {
-    fun toBookingSlotResponse() = BookingSlotResponse(date, status)
+    fun toBookingSlot() = BookingSlot(date, status)
 }
 
-data class BookingSlotResponse(var date: Date, var status: DateStatus)
+data class BookingSlot(var date: Date, var status: DateStatus)

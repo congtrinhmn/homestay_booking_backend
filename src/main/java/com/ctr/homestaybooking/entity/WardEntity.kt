@@ -27,12 +27,12 @@ class WardEntity(
         var districtEntity: DistrictEntity? = null
 
 ) {
-    fun toWardResponse() = WardResponse(id, type, name)
+    fun toWard() = Ward(id, type, name)
 
-    fun toWardDetailResponse() = WardDetailResponse(id, type, name, districtEntity?.toDistrictDetailResponse())
+    fun toWardDetail() = WardDetail(id, type, name, districtEntity?.toDistrictDetail())
 }
 
-data class WardResponse(var id: Int = 0, var type: String, var name: String)
+data class Ward(var id: Int = 0, var type: String, var name: String)
 
-data class WardDetailResponse(var id: Int = 0, var type: String, var name: String, var districtDetailResponse: DistrictDetailResponse?)
+data class WardDetail(var id: Int = 0, var type: String, var name: String, var districtDetail: DistrictDetail?)
 

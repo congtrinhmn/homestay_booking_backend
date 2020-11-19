@@ -19,7 +19,7 @@ class ReviewService(private val reviewRepository: ReviewRepository) {
             ?: throw ReviewNotFoundException(id)
 
     fun addReview(reviewEntity: ReviewEntity): ReviewEntity {
-        val a = reviewEntity.bookingEntity?.let {
+        reviewEntity.bookingEntity?.let {
             if (reviewRepository.existsById(it.id)) {
                 throw  ReviewIsDuplicateException(it.id)
             }

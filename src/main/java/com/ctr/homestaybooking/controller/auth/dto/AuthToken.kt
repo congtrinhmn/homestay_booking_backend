@@ -1,8 +1,8 @@
 package com.ctr.homestaybooking.controller.auth.dto
 
-import com.ctr.homestaybooking.controller.user.dto.UserDetailResponse
+import com.ctr.homestaybooking.entity.UserDetail
 
 data class AuthToken(
-        val userDetailResponse: UserDetailResponse,
+        val userDetail: UserDetail,
         val token: String
 )

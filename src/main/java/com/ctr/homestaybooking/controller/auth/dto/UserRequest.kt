@@ -47,6 +47,6 @@ data class UserRequest(
         val phoneNumber: String
 ) {
     fun toUserEntity(): UserEntity {
-            return UserEntity(0, email, uuid, deviceToken, password, setOf(RoleEntity(1, ROLE_USER)), imageUrl, firstName, lastName, gender, birthday, phoneNumber)
+        return UserEntity(0, email, uuid, deviceToken, password, setOf(RoleEntity(1, ROLE_USER)), imageUrl, firstName, lastName, gender, birthday, phoneNumber)
     }
 }
