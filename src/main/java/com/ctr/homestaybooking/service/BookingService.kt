@@ -88,7 +88,7 @@ class BookingService(private val bookingRepository: BookingRepository,
                     id.toString(),
                     totalPaid.toInt().toString(),
                     placeEntity.name,
-                    "homestay://payment/booking/$id",
+                    "homestay://payment/$id",
                     "https://homestay-booking.herokuapp.com/api/bookings/$id/paid",
                     extraData)
         }
