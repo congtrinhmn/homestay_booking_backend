@@ -34,7 +34,6 @@ class DataSeedingListener(private val userRepository: UserRepository,
     override fun onApplicationEvent(event: ContextRefreshedEvent) {
         Role.values().forEach { addRoleIfMissing(it) }
         addUserIfMissing()
-        addProvinceIfMissing()
         Amenity.values().forEach { addAmenityIfMissing(it) }
         placeTypes.forEach { addPlaceTypeIfMissing(it) }
 

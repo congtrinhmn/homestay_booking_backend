@@ -45,8 +45,8 @@ class BookingController(private val bookingService: BookingService,
     }
 
     @PostMapping("/{id}")
-    fun requestPayment(@PathVariable("id") id: Int): ApiData<CaptureMoMoResponse> {
-        return ApiData(bookingService.requestPayment(id))
+    fun requestPayment(@PathVariable("id") id: Int): CaptureMoMoResponse {
+        return bookingService.requestPayment(id)
     }
 
     @PutMapping
