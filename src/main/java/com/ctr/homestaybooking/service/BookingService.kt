@@ -12,7 +12,9 @@ import com.ctr.homestaybooking.shared.isBefore
 import com.ctr.homestaybooking.shared.isContainAll
 import com.ctr.homestaybooking.shared.toNullable
 import com.mservice.allinone.models.CaptureMoMoResponse
+import com.mservice.allinone.models.QueryStatusTransactionResponse
 import com.mservice.allinone.processor.allinone.CaptureMoMo
+import com.mservice.allinone.processor.allinone.QueryStatusTransaction
 import com.mservice.shared.sharedmodels.Environment
 import org.springframework.stereotype.Service
 import java.util.*
@@ -81,18 +83,33 @@ class BookingService(private val bookingRepository: BookingRepository,
     fun requestPayment(id: Int): CaptureMoMoResponse {
         val extraData = "merchantName=HomestayBooking"
         val bookingEntity = bookingRepository.findById(id).toNullable() ?: throw BookingNotFoundException(id)
+        val now = Calendar.getInstance().timeInMillis.toString()
         bookingEntity.apply {
             val environment = Environment.selectEnv(Environment.EnvTarget.DEV, Environment.ProcessType.PAY_GATE)
-            return CaptureMoMo.process(
+            val captureMoMoResponse = CaptureMoMo.process(
                     environment,
-                    id.toString(),
-                    Calendar.getInstance().timeInMillis.toString(),
+                    now,
+                    now,
                     totalPaid.toInt().toString(),
                     placeEntity.name,
                     "homestay://payment/$id",
                     "https://homestay-booking.herokuapp.com/api/bookings/$id/paid",
                     extraData)
+            if (captureMoMoResponse.payUrl.isNotEmpty() && captureMoMoResponse.orderId.isNotEmpty()) {
+                bookingEntity.orderId = captureMoMoResponse.orderId.toLong()
+            }
+            bookingRepository.save(bookingEntity)
+            return captureMoMoResponse
         }
+    }
+
+    fun checkPaymentStatus(id: Int): QueryStatusTransactionResponse {
+        val bookingEntity = bookingRepository.findById(id).toNullable() ?: throw BookingNotFoundException(id)
+        val environment = Environment.selectEnv(Environment.EnvTarget.DEV, Environment.ProcessType.PAY_GATE)
+        return QueryStatusTransaction.process(
+                environment,
+                bookingEntity.orderId.toString(),
+                Calendar.getInstance().timeInMillis.toString())
     }
 
     fun changeBookingStatus(id: Int, bookingStatus: BookingStatus): BookingEntity {

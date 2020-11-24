@@ -10,6 +10,7 @@ import com.ctr.homestaybooking.shared.ROLE_ADMIN
 import com.ctr.homestaybooking.shared.enums.BookingStatus
 import com.ctr.homestaybooking.shared.model.ApiData
 import com.mservice.allinone.models.CaptureMoMoResponse
+import com.mservice.allinone.models.QueryStatusTransactionResponse
 import org.springframework.security.access.annotation.Secured
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
@@ -44,11 +45,6 @@ class BookingController(private val bookingService: BookingService,
         return ApiData(bookingService.addBooking(bookingBody.toBookingEntity(placeService, userService, promoService)).toBookingDetail())
     }
 
-    @PostMapping("/{id}")
-    fun requestPayment(@PathVariable("id") id: Int): CaptureMoMoResponse {
-        return bookingService.requestPayment(id)
-    }
-
     @PutMapping
     fun editBooking(@RequestBody @Validated bookingBody: BookingBody): ApiData<BookingDetail> {
         return ApiData(bookingService.editBooking(bookingBody.toBookingEntity(placeService, userService, promoService)).toBookingDetail())
@@ -60,13 +56,23 @@ class BookingController(private val bookingService: BookingService,
         bookingService.deleteBookingByID(id)
     }
 
-    @PutMapping("/{id}")
+    @PatchMapping("/{id}")
     fun changeBookingStatus(@PathVariable("id") id: Int, bookingStatus: BookingStatus): ApiData<BookingDetail> {
         return ApiData(bookingService.changeBookingStatus(id, bookingStatus).toBookingDetail())
     }
 
-    @PutMapping("/{id}/paid")
+    @PatchMapping("/{id}/paid")
     fun changeBookingStatusPaid(@PathVariable("id") id: Int): ApiData<BookingDetail> {
         return ApiData(bookingService.changeBookingStatusPaid(id).toBookingDetail())
+    }
+
+    @PostMapping("/{id}/payment")
+    fun requestPayment(@PathVariable("id") id: Int): CaptureMoMoResponse {
+        return bookingService.requestPayment(id)
+    }
+
+    @GetMapping("/{id}/payment")
+    fun checkPaymentStatus(@PathVariable("id") id: Int): QueryStatusTransactionResponse {
+        return bookingService.checkPaymentStatus(id)
     }
 }
