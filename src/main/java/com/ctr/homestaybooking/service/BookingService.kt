@@ -5,9 +5,12 @@ import com.ctr.homestaybooking.controller.booking.ConflictException
 import com.ctr.homestaybooking.controller.booking.MethodNotAllowedException
 import com.ctr.homestaybooking.entity.BookingEntity
 import com.ctr.homestaybooking.repository.BookingRepository
-import com.ctr.homestaybooking.shared.*
+import com.ctr.homestaybooking.shared.datesUntil
 import com.ctr.homestaybooking.shared.enums.BookingStatus
 import com.ctr.homestaybooking.shared.enums.DateStatus
+import com.ctr.homestaybooking.shared.isBefore
+import com.ctr.homestaybooking.shared.isContainAll
+import com.ctr.homestaybooking.shared.toNullable
 import com.mservice.allinone.models.CaptureMoMoResponse
 import com.mservice.allinone.processor.allinone.CaptureMoMo
 import com.mservice.shared.sharedmodels.Environment
@@ -33,7 +36,6 @@ class BookingService(private val bookingRepository: BookingRepository,
     fun addBooking(bookingEntity: BookingEntity): BookingEntity {
         val now = Date()
         bookingEntity.apply {
-            log.info { bookingEntity }
             // check startDate must be before endDate
             if (!startDate.isBefore(endDate)) {
                 throw ConflictException("Start date must be before end date")
@@ -64,7 +66,6 @@ class BookingService(private val bookingRepository: BookingRepository,
                 }
             }
             return bookingRepository.save(bookingEntity).apply {
-                log.info { bookingEntity.placeEntity.id }
                 placeService.updateBookingSlotById(placeEntity.id, bookingDates)
             }
         }
