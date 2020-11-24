@@ -85,7 +85,7 @@ class BookingService(private val bookingRepository: BookingRepository,
             return CaptureMoMo.process(
                     environment,
                     id.toString(),
-                    id.toString(),
+                    Calendar.getInstance().timeInMillis.toString(),
                     totalPaid.toInt().toString(),
                     placeEntity.name,
                     "homestay://payment/$id",
