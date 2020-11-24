@@ -24,7 +24,7 @@ object AllInOne {
     @JvmStatic
     fun main(args: Array<String>) {
         val requestId = "1605770899"
-        var orderId = "1605770899"
+        var orderId = Calendar.getInstance().timeInMillis.toString()
         val amount: Long = 10000
         val orderInfo = "Thanh toan room"
         val returnURL = "https://momo.vn/"
@@ -36,8 +36,10 @@ object AllInOne {
 
 //          Please uncomment the code to actually use the necessary All-In-One gateway payment processes
 //          Remember to change the IDs
-        val captureMoMoResponse = CaptureMoMo.process(environment, orderId, requestId, java.lang.Long.toString(amount), orderInfo, returnURL, notifyURL, extraData)
-        val queryStatusTransactionResponse = QueryStatusTransaction.process(environment, orderId, requestId)
+        val captureMoMoResponse = CaptureMoMo.process(environment, orderId, orderId, java.lang.Long.toString(amount), orderInfo, returnURL, notifyURL, extraData)
+        println("--= " + captureMoMoResponse)
+        val queryStatusTransactionResponse = QueryStatusTransaction.process(environment, orderId, orderId)
+        println("--= " + queryStatusTransactionResponse)
 
 //          Refund -- Manual Testing
 //            RefundMoMoResponse response = RefundMoMo.process(environment, "1562135830002", orderId, "10000", "2304963912");

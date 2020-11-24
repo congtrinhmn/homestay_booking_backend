@@ -61,7 +61,7 @@ class BookingController(private val bookingService: BookingService,
         return ApiData(bookingService.changeBookingStatus(id, bookingStatus).toBookingDetail())
     }
 
-    @PatchMapping("/{id}/paid")
+    @PostMapping("/{id}/paid")
     fun changeBookingStatusPaid(@PathVariable("id") id: Int): ApiData<BookingDetail> {
         return ApiData(bookingService.changeBookingStatusPaid(id).toBookingDetail())
     }

@@ -83,20 +83,22 @@ class BookingService(private val bookingRepository: BookingRepository,
     fun requestPayment(id: Int): CaptureMoMoResponse {
         val extraData = "merchantName=HomestayBooking"
         val bookingEntity = bookingRepository.findById(id).toNullable() ?: throw BookingNotFoundException(id)
-        val now = Calendar.getInstance().timeInMillis.toString()
+        val now = Calendar.getInstance().timeInMillis
         bookingEntity.apply {
             val environment = Environment.selectEnv(Environment.EnvTarget.DEV, Environment.ProcessType.PAY_GATE)
             val captureMoMoResponse = CaptureMoMo.process(
                     environment,
-                    now,
-                    now,
+                    now.toString(),
+                    now.toString(),
                     totalPaid.toInt().toString(),
                     placeEntity.name,
                     "homestay://payment/$id",
                     "https://homestay-booking.herokuapp.com/api/bookings/$id/paid",
                     extraData)
-            if (captureMoMoResponse.payUrl.isNotEmpty() && captureMoMoResponse.orderId.isNotEmpty()) {
+            if (captureMoMoResponse != null && captureMoMoResponse.payUrl.isNotEmpty() && captureMoMoResponse.orderId.isNotEmpty()) {
                 bookingEntity.orderId = captureMoMoResponse.orderId.toLong()
+            } else {
+                bookingEntity.orderId = now
             }
             bookingRepository.save(bookingEntity)
             return captureMoMoResponse
