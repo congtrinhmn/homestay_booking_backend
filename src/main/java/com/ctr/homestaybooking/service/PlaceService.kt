@@ -4,6 +4,7 @@ import com.ctr.homestaybooking.config.NotFoundException
 import com.ctr.homestaybooking.controller.place.PlaceNotFoundException
 import com.ctr.homestaybooking.entity.BookingSlotEntity
 import com.ctr.homestaybooking.entity.PlaceEntity
+import com.ctr.homestaybooking.entity.UserEntity
 import com.ctr.homestaybooking.entity.WardEntity
 import com.ctr.homestaybooking.repository.BookingSlotRepository
 import com.ctr.homestaybooking.repository.PlaceRepository
@@ -39,6 +40,9 @@ class PlaceService(private val placeRepository: PlaceRepository,
 
     fun getPlacesByWardEntity(wardEntity: WardEntity): Set<PlaceEntity> =
             placeRepository.findByWardEntity(wardEntity)
+
+    fun getPlacesByUserEntity(userEntity: UserEntity): Set<PlaceEntity> =
+            placeRepository.findByUserEntity(userEntity)
 
     fun getPlacesByDistrictId(id: Int): Set<PlaceEntity> =
             placeRepository.findByDistrictId(id) ?: throw  NotFoundException("District", id)

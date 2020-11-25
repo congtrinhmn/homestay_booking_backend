@@ -1,6 +1,7 @@
 package com.ctr.homestaybooking.repository
 
 import com.ctr.homestaybooking.entity.PlaceEntity
+import com.ctr.homestaybooking.entity.UserEntity
 import com.ctr.homestaybooking.entity.WardEntity
 import com.ctr.homestaybooking.shared.enums.PlaceStatus
 import org.springframework.data.domain.Pageable
@@ -20,4 +21,6 @@ interface PlaceRepository : JpaRepository<PlaceEntity, Int>, JpaSpecificationExe
             inner join districts d on w.district_id = d.id
             where d.id = :id""", nativeQuery = true)
     fun findByDistrictId(id: Int): Set<PlaceEntity>?
+
+    fun findByUserEntity(userEntity: UserEntity): Set<PlaceEntity>
 }

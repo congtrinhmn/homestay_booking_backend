@@ -46,6 +46,11 @@ class PlaceController(private val placeService: PlaceService,
         return ApiData(placeService.getPlacesByDistrictId(id).map { it.toPlace() })
     }
 
+    @GetMapping("/user/{id}")
+    fun getPlacesByUserId(@PathVariable("id") id: Int): ApiData<List<Place>> {
+        return ApiData(placeService.getPlacesByUserEntity(userService.getUserById(id)).map { it.toPlace() })
+    }
+
     @PostMapping
     fun addPlace(@RequestBody @Validated placeBody: PlaceBody): ApiData<PlaceDetail> {
         return ApiData(placeService.addPlace(placeBody.toPlaceEntity(userService, locationService, placeTypeService, amenityService)).toPlaceDetail())
