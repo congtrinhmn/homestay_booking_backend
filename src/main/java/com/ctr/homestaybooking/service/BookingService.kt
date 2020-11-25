@@ -32,6 +32,8 @@ class BookingService(private val bookingRepository: BookingRepository,
 
     fun getBookingByUserId(id: Int) = bookingRepository.findByUserEntity(userService.getUserById(id))
 
+    fun getBookingByHostId(id: Int) = bookingRepository.findByHostId(id)
+
     fun getBookingById(id: Int) = bookingRepository.findById(id).toNullable()
             ?: throw BookingNotFoundException(id)
 

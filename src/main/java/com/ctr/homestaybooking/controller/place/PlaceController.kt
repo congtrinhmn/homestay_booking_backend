@@ -47,8 +47,8 @@ class PlaceController(private val placeService: PlaceService,
     }
 
     @GetMapping("/user/{id}")
-    fun getPlacesByUserId(@PathVariable("id") id: Int): ApiData<List<Place>> {
-        return ApiData(placeService.getPlacesByUserEntity(userService.getUserById(id)).map { it.toPlace() })
+    fun getPlacesByUserId(@PathVariable("id") id: Int): ApiData<List<PlaceDetail>> {
+        return ApiData(placeService.getPlacesByUserEntity(userService.getUserById(id)).map { it.toPlaceDetail() })
     }
 
     @PostMapping

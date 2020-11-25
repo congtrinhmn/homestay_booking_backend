@@ -40,6 +40,11 @@ class BookingController(private val bookingService: BookingService,
         return ApiData(bookingService.getBookingByUserId(id).map { it.toBookingDetail() })
     }
 
+    @GetMapping("/host/{id}")
+    fun getBookingByHostId(@PathVariable("id") id: Int): ApiData<List<BookingDetail>> {
+        return ApiData(bookingService.getBookingByHostId(id).map { it.toBookingDetail() })
+    }
+
     @PostMapping
     fun addBooking(@RequestBody @Validated bookingBody: BookingBody): ApiData<BookingDetail> {
         return ApiData(bookingService.addBooking(bookingBody.toBookingEntity(placeService, userService, promoService)).toBookingDetail())
