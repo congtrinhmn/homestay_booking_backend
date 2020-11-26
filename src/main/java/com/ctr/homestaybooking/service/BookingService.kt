@@ -69,6 +69,11 @@ class BookingService(private val bookingRepository: BookingRepository,
                     }
                 }
             }
+
+            if (bookingEntity.placeEntity.userEntity?.id == bookingEntity.userEntity.id) {
+                throw ConflictException("Can't book your place!")
+            }
+
             return bookingRepository.save(bookingEntity).apply {
                 placeService.updateBookingSlotById(placeEntity.id, bookingDates)
             }
