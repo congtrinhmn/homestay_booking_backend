@@ -67,7 +67,9 @@ class BookingEntity(
         @OneToOne(mappedBy = "bookingEntity")
         var reviewEntity: ReviewEntity? = null,
 
-        var orderId: Long? = null
+        var orderId: String? = null,
+
+        var transId: String? = null
 ) {
     fun toBookingDetail() = BookingDetail(
             id = id,
@@ -86,7 +88,8 @@ class BookingEntity(
             user = userEntity.toUserDetail(),
             promo = promoEntity?.toPromo(),
             review = reviewEntity?.toReview(),
-            orderId = orderId
+            orderId = orderId,
+            transId = transId
     )
 
     override fun toString() = toBookingDetail().toString()
@@ -109,7 +112,8 @@ data class BookingDetail(
         var user: UserDetail,
         var promo: Promo?,
         var review: Review?,
-        var orderId: Long?
+        var orderId: String?,
+        var transId: String?
 )
 
 data class BookingBody(

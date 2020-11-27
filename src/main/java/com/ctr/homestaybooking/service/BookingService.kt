@@ -40,7 +40,7 @@ class BookingService(private val bookingRepository: BookingRepository,
         bookingEntity.apply {
             // check startDate must be before endDate
             if (!startDate.isBefore(endDate)) {
-                throw ConflictException("Start date must be before end date")
+                throw MessageException("Start date must be before end date")
             }
 
             // check booking dates is available
@@ -49,27 +49,27 @@ class BookingService(private val bookingRepository: BookingRepository,
                 val availableDates = place.bookingSlotEntities?.filter { it.status == DateStatus.AVAILABLE }?.map { it.date }
                         ?: listOf()
                 if (!availableDates.isContainAll(bookingDates)) {
-                    throw ConflictException("Booking dates is unavailable")
+                    throw MessageException("Booking dates is unavailable")
                 }
 
                 // check promo is valid
                 bookingEntity.promoEntity?.id?.let { id ->
                     (place.promoEntities?.find { it.id == id }
-                            ?: throw ConflictException("Promo code is invalid")).apply {
+                            ?: throw MessageException("Promo code is invalid")).apply {
 
                         if (now.before(startDate)) {
-                            throw ConflictException("Promo code is not start")
+                            throw MessageException("Promo code is not start")
                         }
 
                         if (now.after(endDate)) {
-                            throw ConflictException("Promo code is expired")
+                            throw MessageException("Promo code is expired")
                         }
                     }
                 }
             }
 
             if (bookingEntity.placeEntity.userEntity?.id == bookingEntity.userEntity.id) {
-                throw ConflictException("Can't book your place!")
+                throw MessageException("Can't book your place!")
             }
 
             return bookingRepository.save(bookingEntity).apply {
@@ -102,6 +102,9 @@ class BookingService(private val bookingRepository: BookingRepository,
     fun requestPayment(id: Int): CaptureMoMoResponse {
         val extraData = "merchantName=HomestayBooking"
         val bookingEntity = bookingRepository.findById(id).toNullable() ?: throw BookingNotFoundException(id)
+        if (bookingEntity.bookingStatus != BookingStatus.ACCEPTED || bookingEntity.bookingStatus != BookingStatus.UNPAID) {
+            throw MessageException("Booking must be accepted by host")
+        }
         val now = Calendar.getInstance().timeInMillis
         bookingEntity.apply {
             var captureMoMoResponse: CaptureMoMoResponse? = null
@@ -117,7 +120,7 @@ class BookingService(private val bookingRepository: BookingRepository,
                             "https://homestay-booking.herokuapp.com/api/bookings/$id/paid",
                             extraData).apply { log.info { "captureMoMoResponse: " + captureMoMoResponse } }
                 } else {
-                    bookingEntity.orderId = captureMoMoResponse!!.orderId.toLong()
+                    bookingEntity.orderId = captureMoMoResponse!!.orderId
                     bookingRepository.save(bookingEntity)
                     return@repeat
                 }
@@ -126,9 +129,15 @@ class BookingService(private val bookingRepository: BookingRepository,
         }
     }
 
-    fun changeBookingStatusPaid(id: Int): BookingEntity {
+    fun changeBookingStatusPaid(id: Int, errorCode: Int, orderId: String, transId: String): BookingEntity {
         val bookingEntity = bookingRepository.findById(id).toNullable() ?: throw BookingNotFoundException(id)
-        bookingEntity.bookingStatus = BookingStatus.PAID
+        if (errorCode == 0) {
+            bookingEntity.let {
+                it.bookingStatus = BookingStatus.PAID
+                it.orderId = orderId
+                it.transId = transId
+            }
+        }
         return bookingRepository.save(bookingEntity)
     }
 
@@ -139,7 +148,7 @@ class BookingService(private val bookingRepository: BookingRepository,
             if (response == null) {
                 response = QueryStatusTransaction.process(
                         environment,
-                        bookingEntity.orderId.toString(),
+                        bookingEntity.orderId,
                         Calendar.getInstance().timeInMillis.toString()).apply { "QueryStatusTransaction: $response" }
             } else {
                 return@repeat
@@ -150,10 +159,18 @@ class BookingService(private val bookingRepository: BookingRepository,
 
     fun refundPayment(id: Int): RefundMoMoResponse {
         val bookingEntity = bookingRepository.findById(id).toNullable() ?: throw BookingNotFoundException(id)
-        if (bookingEntity.orderId == null) throw PaymentRequired()
+        if (bookingEntity.transId == null) throw PaymentRequiredException()
         val now = Calendar.getInstance().timeInMillis
-        val response = RefundMoMo.process(environment, now.toString(), bookingEntity.orderId.toString(), bookingEntity.totalPaid.toString(), "2304963912").apply { log.info { this } }
+        var response: RefundMoMoResponse? = null
+        if (response == null) {
+            response = RefundMoMo.process(environment,
+                    now.toString(),
+                    bookingEntity.orderId.toString(),
+                    bookingEntity.totalPaid.toString(),
+                    bookingEntity.transId.toString()
+            )
+        }
 //        RefundStatus.process(environment, "1562135830002", "1561972787557");
-        return response
+        return response.apply { log.info { this } } ?: throw MethodNotSuccess()
     }
 }

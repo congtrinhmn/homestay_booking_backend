@@ -8,7 +8,6 @@ import com.ctr.homestaybooking.service.PromoService
 import com.ctr.homestaybooking.service.UserService
 import com.ctr.homestaybooking.shared.ROLE_ADMIN
 import com.ctr.homestaybooking.shared.enums.BookingStatus
-import com.ctr.homestaybooking.shared.log
 import com.ctr.homestaybooking.shared.model.ApiData
 import com.mservice.allinone.models.CaptureMoMoResponse
 import com.mservice.allinone.models.QueryStatusTransactionResponse
@@ -101,11 +100,7 @@ class BookingController(private val bookingService: BookingService,
                                 @RequestParam("extraData") extraData: String,
                                 @RequestParam("signature") signature: String
     ): ApiData<BookingDetail> {
-        log.info { orderId }
-        log.info { amount }
-        log.info { errorCode }
-        log.info { message }
-        return ApiData(bookingService.changeBookingStatusPaid(id).toBookingDetail())
+        return ApiData(bookingService.changeBookingStatusPaid(id, errorCode, orderId, transId).toBookingDetail())
     }
 
     @GetMapping("/{id}/payment")

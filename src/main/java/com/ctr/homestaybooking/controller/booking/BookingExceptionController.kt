@@ -23,14 +23,14 @@ class BookingExceptionController {
         return Response.buildResponseError(ApiError(HttpStatus.CONFLICT, exception))
     }
 
-    @ExceptionHandler(value = [ConflictException::class])
-    fun exception(exception: ConflictException): ResponseEntity<Any> {
-        return Response.buildResponseError(ApiError(HttpStatus.CONFLICT, exception))
+    @ExceptionHandler(value = [MessageException::class])
+    fun exception(exception: MessageException): ResponseEntity<Any> {
+        return Response.buildResponseError(ApiError(HttpStatus.BAD_REQUEST, exception))
     }
 
     @ExceptionHandler(value = [BookingIsNotExistsException::class])
     fun exception(exception: BookingIsNotExistsException): ResponseEntity<Any> {
-        return Response.buildResponseError(ApiError(HttpStatus.BAD_GATEWAY, exception))
+        return Response.buildResponseError(ApiError(HttpStatus.BAD_REQUEST, exception))
     }
 
     @ExceptionHandler(value = [MethodNotAllowedException::class])
@@ -38,8 +38,8 @@ class BookingExceptionController {
         return Response.buildResponseError(ApiError(HttpStatus.FORBIDDEN, exception))
     }
 
-    @ExceptionHandler(value = [PaymentRequired::class])
-    fun exception(exception: PaymentRequired): ResponseEntity<Any> {
+    @ExceptionHandler(value = [PaymentRequiredException::class])
+    fun exception(exception: PaymentRequiredException): ResponseEntity<Any> {
         return Response.buildResponseError(ApiError(HttpStatus.PAYMENT_REQUIRED, exception))
     }
 
@@ -57,8 +57,8 @@ class BookingIsNotExistsException(id: Int) : RuntimeException("Booking is not ex
 
 class MethodNotAllowedException : RuntimeException("Method not allowed")
 
-class PaymentRequired : RuntimeException("Payment required")
+class PaymentRequiredException : RuntimeException("Payment required")
 
 class MethodNotSuccess : RuntimeException("Method not success. Please try against!")
 
-class ConflictException(message: String?) : RuntimeException(message)
+class MessageException(message: String?) : RuntimeException(message)
