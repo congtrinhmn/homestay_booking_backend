@@ -134,23 +134,26 @@ class BookingService(private val bookingRepository: BookingRepository,
         val bookingEntity = bookingRepository.findById(id).toNullable() ?: throw BookingNotFoundException(id)
         if (errorCode == 0) {
             environment.partnerInfo.apply {
-                val raw = "partnerCode=$partnerCode&accessKey=$accessKey&requestId=$requestId\n" +
-                        "&amount=$amount&orderId=$orderId&orderInfo=$orderInfo\n" +
-                        "&orderType=$orderType&transId=$transId\n" +
-                        "&message=$message&localMessage=$localMessage\n" +
-                        "&responseTime=$responseTime&errorCode=$errorCode\n" +
-                        "&payType=$payType&extraData=$extraData"
-                val sign = Encoder.signHmacSHA256(raw, secretKey)
-                log.info { sign }
-                log.info { signature }
+                log.info { this }.apply {
+                    val raw = "partnerCode=$partnerCode&accessKey=$accessKey&requestId=$requestId\n" +
+                            "&amount=$amount&orderId=$orderId&orderInfo=$orderInfo\n" +
+                            "&orderType=$orderType&transId=$transId\n" +
+                            "&message=$message&localMessage=$localMessage\n" +
+                            "&responseTime=$responseTime&errorCode=$errorCode\n" +
+                            "&payType=$payType&extraData=$extraData"
+                    val sign = Encoder.signHmacSHA256(raw, secretKey)
+                    raw.apply { log.info { "raw" + this } }
+                    sign.apply { log.info { "sign" + this } }
+                    signature.apply { log.info { "raw" + this } }
+                }
+                bookingEntity.let {
+                    it.bookingStatus = BookingStatus.PAID
+                    it.orderId = orderId
+                    it.transId = transId
+                }
             }
-            bookingEntity.let {
-                it.bookingStatus = BookingStatus.PAID
-                it.orderId = orderId
-                it.transId = transId
-            }
+            return bookingRepository.save(bookingEntity)
         }
-        return bookingRepository.save(bookingEntity)
     }
 
     fun checkPaymentStatus(id: Int): QueryStatusTransactionResponse {
