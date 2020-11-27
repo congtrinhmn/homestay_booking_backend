@@ -100,7 +100,7 @@ class BookingController(private val bookingService: BookingService,
                                 @RequestParam("extraData") extraData: String,
                                 @RequestParam("signature") signature: String
     ): ApiData<BookingDetail> {
-        return ApiData(bookingService.changeBookingStatusPaid(id, errorCode, orderId, transId).toBookingDetail())
+        return ApiData(bookingService.changeBookingStatusPaid(id, partnerCode, accessKey, requestId, amount, orderId, orderInfo, orderType, transId, errorCode, message, localMessage, payType, responseTime, extraData, signature).toBookingDetail())
     }
 
     @GetMapping("/{id}/payment")

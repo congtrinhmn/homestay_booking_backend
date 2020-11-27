@@ -13,6 +13,7 @@ import com.mservice.allinone.processor.allinone.CaptureMoMo
 import com.mservice.allinone.processor.allinone.QueryStatusTransaction
 import com.mservice.allinone.processor.allinone.RefundMoMo
 import com.mservice.shared.sharedmodels.Environment
+import com.mservice.shared.utils.Encoder
 import org.springframework.stereotype.Service
 import java.util.*
 
@@ -129,9 +130,20 @@ class BookingService(private val bookingRepository: BookingRepository,
         }
     }
 
-    fun changeBookingStatusPaid(id: Int, errorCode: Int, orderId: String, transId: String): BookingEntity {
+    fun changeBookingStatusPaid(id: Int, partnerCode: String, accessKey: String, requestId: String, amount: String, orderId: String, orderInfo: String, orderType: String, transId: String, errorCode: Int, message: String, localMessage: String, payType: String, responseTime: String, extraData: String, signature: String): BookingEntity {
         val bookingEntity = bookingRepository.findById(id).toNullable() ?: throw BookingNotFoundException(id)
         if (errorCode == 0) {
+            environment.partnerInfo.apply {
+                val raw = "partnerCode=$partnerCode&accessKey=$accessKey&requestId=$requestId\n" +
+                        "&amount=$amount&orderId=$orderId&orderInfo=$orderInfo\n" +
+                        "&orderType=$orderType&transId=$transId\n" +
+                        "&message=$message&localMessage=$localMessage\n" +
+                        "&responseTime=$responseTime&errorCode=$errorCode\n" +
+                        "&payType=$payType&extraData=$extraData"
+                val sign = Encoder.signHmacSHA256(raw, secretKey)
+                log.info { sign }
+                log.info { signature }
+            }
             bookingEntity.let {
                 it.bookingStatus = BookingStatus.PAID
                 it.orderId = orderId
