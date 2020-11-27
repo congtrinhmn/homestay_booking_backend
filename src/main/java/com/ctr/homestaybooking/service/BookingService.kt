@@ -152,8 +152,8 @@ class BookingService(private val bookingRepository: BookingRepository,
                     it.transId = transId
                 }
             }
-            return bookingRepository.save(bookingEntity)
         }
+        return bookingRepository.save(bookingEntity)
     }
 
     fun checkPaymentStatus(id: Int): QueryStatusTransactionResponse {
