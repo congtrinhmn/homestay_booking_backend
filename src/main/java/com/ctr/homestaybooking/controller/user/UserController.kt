@@ -5,6 +5,7 @@ import com.ctr.homestaybooking.entity.UserDetail
 import com.ctr.homestaybooking.service.UserService
 import com.ctr.homestaybooking.shared.ROLE_ADMIN
 import com.ctr.homestaybooking.shared.model.ApiData
+import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation
 import org.springframework.security.access.annotation.Secured
 import org.springframework.validation.annotation.Validated
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/api/users")
+@Api(value = "User")
 class UserController(private val userService: UserService) {
 
     @GetMapping
@@ -44,7 +46,7 @@ class UserController(private val userService: UserService) {
 
     @Secured(ROLE_ADMIN)
     @PatchMapping("/{id}/status")
-    @ApiOperation(value = "Change user status ACTIVE or INACTIVE")
+    @ApiOperation(value = "Change user status to ACTIVE or INACTIVE")
     fun changeStatus(@PathVariable("id") id: Int): ApiData<UserDetail> {
         return ApiData(userService.reverseStatusUserFollowId(id).toUserDetail())
     }
