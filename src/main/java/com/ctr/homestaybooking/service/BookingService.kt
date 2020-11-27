@@ -103,7 +103,7 @@ class BookingService(private val bookingRepository: BookingRepository,
     fun requestPayment(id: Int): CaptureMoMoResponse {
         val extraData = "merchantName=HomestayBooking"
         val bookingEntity = bookingRepository.findById(id).toNullable() ?: throw BookingNotFoundException(id)
-        if (bookingEntity.bookingStatus != BookingStatus.ACCEPTED || bookingEntity.bookingStatus != BookingStatus.UNPAID) {
+        if (bookingEntity.bookingStatus != BookingStatus.ACCEPTED && bookingEntity.bookingStatus != BookingStatus.UNPAID) {
             throw MessageException("Booking must be accepted by host")
         }
         val now = Calendar.getInstance().timeInMillis
