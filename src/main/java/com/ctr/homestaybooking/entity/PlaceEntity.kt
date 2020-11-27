@@ -29,7 +29,6 @@ class PlaceEntity(
         @Column(columnDefinition = "text")
         var description: String?,
 
-        @Enumerated(EnumType.STRING)
         var bookingType: BookingType?,
 
         var longitude: String?,
