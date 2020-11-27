@@ -35,7 +35,17 @@ class BookingExceptionController {
 
     @ExceptionHandler(value = [MethodNotAllowedException::class])
     fun exception(exception: MethodNotAllowedException): ResponseEntity<Any> {
-        return Response.buildResponseError(ApiError(HttpStatus.METHOD_NOT_ALLOWED, exception))
+        return Response.buildResponseError(ApiError(HttpStatus.FORBIDDEN, exception))
+    }
+
+    @ExceptionHandler(value = [PaymentRequired::class])
+    fun exception(exception: PaymentRequired): ResponseEntity<Any> {
+        return Response.buildResponseError(ApiError(HttpStatus.PAYMENT_REQUIRED, exception))
+    }
+
+    @ExceptionHandler(value = [MethodNotSuccess::class])
+    fun exception(exception: MethodNotSuccess): ResponseEntity<Any> {
+        return Response.buildResponseError(ApiError(HttpStatus.FORBIDDEN, exception))
     }
 }
 
@@ -46,5 +56,9 @@ class BookingIsExistsException(id: Int) : RuntimeException("Booking is exist wit
 class BookingIsNotExistsException(id: Int) : RuntimeException("Booking is not exist with id: $id")
 
 class MethodNotAllowedException : RuntimeException("Method not allowed")
+
+class PaymentRequired : RuntimeException("Payment required")
+
+class MethodNotSuccess : RuntimeException("Method not success. Please try against!")
 
 class ConflictException(message: String?) : RuntimeException(message)

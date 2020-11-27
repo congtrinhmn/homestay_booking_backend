@@ -8,9 +8,11 @@ import com.ctr.homestaybooking.service.PromoService
 import com.ctr.homestaybooking.service.UserService
 import com.ctr.homestaybooking.shared.ROLE_ADMIN
 import com.ctr.homestaybooking.shared.enums.BookingStatus
+import com.ctr.homestaybooking.shared.log
 import com.ctr.homestaybooking.shared.model.ApiData
 import com.mservice.allinone.models.CaptureMoMoResponse
 import com.mservice.allinone.models.QueryStatusTransactionResponse
+import com.mservice.allinone.models.RefundMoMoResponse
 import io.swagger.annotations.ApiOperation
 import org.springframework.security.access.annotation.Secured
 import org.springframework.validation.annotation.Validated
@@ -74,21 +76,47 @@ class BookingController(private val bookingService: BookingService,
         return ApiData(bookingService.changeBookingStatus(id, bookingStatus).toBookingDetail())
     }
 
-    @PostMapping("/{id}/paid")
-    @ApiOperation(value = "MoMo'server change booking status to PAID")
-    fun changeBookingStatusPaid(@PathVariable("id") id: Int): ApiData<BookingDetail> {
-        return ApiData(bookingService.changeBookingStatusPaid(id).toBookingDetail())
-    }
-
     @PostMapping("/{id}/payment")
     @ApiOperation(value = "Make a request payment to MoMo'server")
-    fun requestPayment(@PathVariable("id") id: Int): CaptureMoMoResponse {
-        return bookingService.requestPayment(id)
+    fun requestPayment(@PathVariable("id") id: Int): ApiData<CaptureMoMoResponse?> {
+        return ApiData(bookingService.requestPayment(id))
+    }
+
+    @PostMapping("/{id}/paid")
+    @ApiOperation(value = "MoMo'server change booking status to PAID")
+    fun changeBookingStatusPaid(@PathVariable("id") id: Int,
+                                @RequestParam("partnerCode") partnerCode: String,
+                                @RequestParam("accessKey") accessKey: String,
+                                @RequestParam("requestId") requestId: String,
+                                @RequestParam("amount") amount: String,
+                                @RequestParam("orderId") orderId: String,
+                                @RequestParam("orderInfo") orderInfo: String,
+                                @RequestParam("orderType") orderType: String,
+                                @RequestParam("transId") transId: String,
+                                @RequestParam("errorCode") errorCode: Int,
+                                @RequestParam("message") message: String,
+                                @RequestParam("localMessage") localMessage: String,
+                                @RequestParam("payType") payType: String,
+                                @RequestParam("responseTime") responseTime: String,
+                                @RequestParam("extraData") extraData: String,
+                                @RequestParam("signature") signature: String
+    ): ApiData<BookingDetail> {
+        log.info { orderId }
+        log.info { amount }
+        log.info { errorCode }
+        log.info { message }
+        return ApiData(bookingService.changeBookingStatusPaid(id).toBookingDetail())
     }
 
     @GetMapping("/{id}/payment")
     @ApiOperation(value = "Check a payment status from MoMo'server")
-    fun checkPaymentStatus(@PathVariable("id") id: Int): QueryStatusTransactionResponse {
-        return bookingService.checkPaymentStatus(id)
+    fun checkPaymentStatus(@PathVariable("id") id: Int): ApiData<QueryStatusTransactionResponse?> {
+        return ApiData(bookingService.checkPaymentStatus(id))
+    }
+
+    @GetMapping("/{id}/refund")
+    @ApiOperation(value = "Refund payment for user")
+    fun refundPayment(@PathVariable("id") id: Int): ApiData<RefundMoMoResponse> {
+        return ApiData(bookingService.refundPayment(id))
     }
 }
