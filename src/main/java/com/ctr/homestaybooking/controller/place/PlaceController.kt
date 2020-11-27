@@ -31,6 +31,7 @@ class PlaceController(private val placeService: PlaceService,
         return ApiData(placeService.getAllPlace(page, size, sortBy).map { it.toPlace() })
     }
 
+
     @GetMapping("/{id}")
     fun getPlaceById(@PathVariable("id") id: Int): ApiData<PlaceDetail> {
         return ApiData(placeService.getPlaceByID(id).toPlaceDetail())
