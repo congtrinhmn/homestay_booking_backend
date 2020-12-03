@@ -3,9 +3,7 @@ package com.ctr.homestaybooking.controller.review
 import com.ctr.homestaybooking.entity.Review
 import com.ctr.homestaybooking.entity.ReviewBody
 import com.ctr.homestaybooking.service.BookingService
-import com.ctr.homestaybooking.service.PlaceService
 import com.ctr.homestaybooking.service.ReviewService
-import com.ctr.homestaybooking.service.UserService
 import com.ctr.homestaybooking.shared.ROLE_ADMIN
 import com.ctr.homestaybooking.shared.model.ApiData
 import org.springframework.security.access.annotation.Secured
@@ -18,8 +16,6 @@ import org.springframework.web.bind.annotation.*
 @RestController
 @RequestMapping("/api/reviews")
 class ReviewController(private val reviewService: ReviewService,
-                       private val userService: UserService,
-                       private val placeService: PlaceService,
                        private val bookingService: BookingService
 ) {
     @get:GetMapping
@@ -33,12 +29,12 @@ class ReviewController(private val reviewService: ReviewService,
 
     @PostMapping
     fun addReview(@RequestBody @Validated reviewBody: ReviewBody): ApiData<Review> {
-        return ApiData(reviewService.addReview(reviewBody.toReviewEntity(userService, placeService, bookingService)).toReview())
+        return ApiData(reviewService.addReview(reviewBody.toReviewEntity(bookingService)).toReview())
     }
 
     @PutMapping
     fun editReview(@RequestBody @Validated reviewBody: ReviewBody): ApiData<Review> {
-        return ApiData(reviewService.editReview(reviewBody.toReviewEntity(userService, placeService, bookingService)).toReview())
+        return ApiData(reviewService.editReview(reviewBody.toReviewEntity(bookingService)).toReview())
     }
 
     @Secured(ROLE_ADMIN)
