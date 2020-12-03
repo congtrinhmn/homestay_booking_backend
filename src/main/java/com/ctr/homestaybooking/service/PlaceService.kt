@@ -53,13 +53,17 @@ class PlaceService(private val placeRepository: PlaceRepository,
     }
 
     fun editPlace(placeEntity: PlaceEntity): PlaceEntity {
-        (placeRepository.findById(placeEntity.id).toNullable()
-                ?: throw PlaceNotFoundException(placeEntity.id)).apply {
-            placeEntity.let {
-                it.reviewEntities = reviewEntities
+        return if (placeEntity.id == 0) {
+            placeRepository.save(placeEntity)
+        } else {
+            (placeRepository.findById(placeEntity.id).toNullable()
+                    ?: throw PlaceNotFoundException(placeEntity.id)).apply {
+                placeEntity.reviewEntities = reviewEntities
+                placeEntity.status = status
+                placeEntity.userEntity = userEntity
             }
+            placeRepository.save(placeEntity)
         }
-        return placeRepository.save(placeEntity)
     }
 
     fun deletePlaceByID(id: Int): PlaceEntity {
