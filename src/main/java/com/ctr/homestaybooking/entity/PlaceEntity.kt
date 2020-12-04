@@ -157,7 +157,7 @@ class PlaceEntity(
             bookingSlots = bookingSlotEntities?.sortedBy { it.date }?.map { it.toBookingSlot() },
             hostDetail = userEntity?.toUserDetail(),
             wardDetail = wardEntity?.toWardDetail(),
-            placeType = placeTypeEntity?.name,
+            placeType = placeTypeEntity?.toPlaceType(),
             promos = promoEntities?.filter { it.startDate.before(Date()) && it.endDate.after(Date()) }
                     ?.sortedBy { it.discountPercent }
                     ?.map { it.toPromo() },
