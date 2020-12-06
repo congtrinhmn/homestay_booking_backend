@@ -125,7 +125,7 @@ class PlaceEntity(
             size = size,
             pricePerDay = pricePerDay,
             images = imageEntities?.sortedBy { it.id }?.map { it.url },
-            placeType = placeTypeEntity?.name,
+            placeType = placeTypeEntity?.toPlaceType(),
             rateCount = reviewEntities?.size ?: 0,
             rateAverage = if (reviewEntities.isNullOrEmpty()) 0.0 else reviewEntities?.let { reviews -> reviews.sumBy { it.rating }.toDouble().div(reviews.size) }
                     ?: 0.0

@@ -1,5 +1,6 @@
 package com.ctr.homestaybooking.controller.place.dto
 
+import com.ctr.homestaybooking.entity.PlaceType
 import com.ctr.homestaybooking.shared.enums.BookingType
 
 /**
@@ -34,7 +35,7 @@ data class Place(
 
         var images: List<String>?,
 
-        var placeType: String?,
+        var placeType: PlaceType?,
 
         var rateCount: Int = 0,
 
