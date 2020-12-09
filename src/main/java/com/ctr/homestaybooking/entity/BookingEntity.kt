@@ -91,7 +91,6 @@ class BookingEntity(
             orderId = orderId,
             transId = transId
     )
-
     override fun toString() = toBookingDetail().toString()
 }
 

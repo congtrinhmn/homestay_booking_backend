@@ -14,5 +14,6 @@ internal const val PATTERN_PHONE_NUMBER = "(0)+([0-9]{9})\\b"
 internal const val ROLE_USER = "ROLE_USER"
 internal const val ROLE_HOST = "ROLE_HOST"
 internal const val ROLE_ADMIN = "ROLE_ADMIN"
+internal const val BASE_URL_RECOMMEND = "https://homestay-booking-recommender.herokuapp.com/api"
 
 fun <T : Any> Optional<T?>.toNullable(): T? = this.orElse(null)

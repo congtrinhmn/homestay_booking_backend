@@ -75,4 +75,10 @@ class PlaceController(private val placeService: PlaceService,
     fun deletePlace(@PathVariable("id") id: Int) {
         placeService.deletePlaceByID(id)
     }
+
+    @GetMapping("/recommend/{id}")
+    @ApiOperation(value = "Get recommend places for user")
+    fun getRecommendPlacesForUser(@PathVariable("id") id: Int): ApiData<List<Place>> {
+        return ApiData(placeService.getRecommendPlaceForUser(id).map { it.toPlace() })
+    }
 }

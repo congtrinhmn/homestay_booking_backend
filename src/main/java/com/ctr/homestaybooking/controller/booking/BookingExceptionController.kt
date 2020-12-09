@@ -59,6 +59,6 @@ class MethodNotAllowedException : RuntimeException("Method not allowed")
 
 class PaymentRequiredException : RuntimeException("Payment required")
 
-class MethodNotSuccess : RuntimeException("Method not success. Please try against!")
+class MethodNotSuccess : RuntimeException("Không thể tạo yêu cầu thanh toán từ MoMo. Vui lòng thử lại!")
 
 class MessageException(message: String?) : RuntimeException(message)

@@ -1,10 +1,12 @@
 package com.ctr.homestaybooking.service
 
+import com.ctr.homestaybooking.FirebaseMessage
 import com.ctr.homestaybooking.controller.booking.*
 import com.ctr.homestaybooking.entity.BookingEntity
 import com.ctr.homestaybooking.repository.BookingRepository
 import com.ctr.homestaybooking.shared.*
 import com.ctr.homestaybooking.shared.enums.BookingStatus
+import com.ctr.homestaybooking.shared.enums.BookingType
 import com.ctr.homestaybooking.shared.enums.DateStatus
 import com.mservice.allinone.models.CaptureMoMoResponse
 import com.mservice.allinone.models.QueryStatusTransactionResponse
@@ -23,7 +25,8 @@ import java.util.*
 @Service
 class BookingService(private val bookingRepository: BookingRepository,
                      private val placeService: PlaceService,
-                     private val userService: UserService
+                     private val userService: UserService,
+                     private val fcmService: FcmService
 ) {
     private val environment = Environment.selectEnv(Environment.EnvTarget.DEV, Environment.ProcessType.PAY_GATE)
 
@@ -74,7 +77,18 @@ class BookingService(private val bookingRepository: BookingRepository,
             }
 
             return bookingRepository.save(bookingEntity).apply {
-                placeService.updateBookingSlotById(placeEntity.id, bookingDates)
+                placeEntity.userEntity?.deviceToken?.let {
+                    fcmService.pushNotification(FirebaseMessage(
+                            if (placeEntity.bookingType == BookingType.INSTANT_BOOKING) {
+                                "Bạn có đơn đặt chỗ mới từ ${userEntity.getName()}"
+                            } else {
+                                "Bạn có yêu cầu đặt chỗ mới từ ${userEntity.getName()}"
+                            },
+                            "${placeEntity.name}",
+                            it,
+                            mapOf("bookingId" to id).toJsonString()
+                    ))
+                }
             }
         }
     }
@@ -99,17 +113,27 @@ class BookingService(private val bookingRepository: BookingRepository,
         return bookingRepository.deleteById(id)
     }
 
-
     fun requestPayment(id: Int): CaptureMoMoResponse {
-        val extraData = "merchantName=HomestayBooking"
         val bookingEntity = bookingRepository.findById(id).toNullable() ?: throw BookingNotFoundException(id)
-        if (bookingEntity.bookingStatus != BookingStatus.ACCEPTED && bookingEntity.bookingStatus != BookingStatus.UNPAID) {
-            throw MessageException("Booking must be accepted by host")
+        bookingEntity.apply {
+            val bookingDates = startDate.datesUntil(endDate)
+            placeEntity.let { place ->
+                val availableDates = place.bookingSlotEntities?.filter { it.status == DateStatus.AVAILABLE }?.map { it.date }
+                        ?: listOf()
+                if (!availableDates.isContainAll(bookingDates)) {
+                    throw MessageException("Booking dates is booked by another user. Please use")
+                }
+            }
+            if (bookingStatus != BookingStatus.ACCEPTED && bookingStatus != BookingStatus.UNPAID) {
+                throw MessageException("Booking must be accepted by host")
+            }
         }
+
+        val extraData = "merchantName=HomestayBooking"
         val now = Calendar.getInstance().timeInMillis
         bookingEntity.apply {
             var captureMoMoResponse: CaptureMoMoResponse? = null
-            repeat(5) {
+            repeat(1) {
                 if (captureMoMoResponse == null || captureMoMoResponse!!.payUrl.isEmpty() && captureMoMoResponse!!.orderId.isEmpty()) {
                     captureMoMoResponse = CaptureMoMo.process(
                             environment,
@@ -153,7 +177,10 @@ class BookingService(private val bookingRepository: BookingRepository,
                 }
             }
         }
-        return bookingRepository.save(bookingEntity)
+        return bookingRepository.save(bookingEntity).apply {
+            val bookingDates = startDate.datesUntil(endDate)
+            placeService.updateBookingSlotById(placeEntity.id, bookingDates)
+        }
     }
 
     fun checkPaymentStatus(id: Int): QueryStatusTransactionResponse {

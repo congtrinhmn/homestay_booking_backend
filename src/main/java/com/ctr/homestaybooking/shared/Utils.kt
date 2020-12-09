@@ -1,5 +1,6 @@
 package com.ctr.homestaybooking.shared
 
+import com.google.gson.Gson
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
@@ -74,3 +75,5 @@ fun Calendar.format(format: String = FORMAT_DATE_TIME): String {
 //}
 
 fun Double.format(digits: Int) = "%.${digits}f".format(this)
+
+fun Any.toJsonString(): String = Gson().toJson(this)

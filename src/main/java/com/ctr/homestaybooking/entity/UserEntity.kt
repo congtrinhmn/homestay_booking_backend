@@ -63,6 +63,8 @@ class UserEntity(
         fun toUserDetail(): UserDetail {
                 return UserDetail(id, email, uuid, deviceToken, roleEntities.map { it.name }.toSet(), imageUrl, firstName, lastName, gender, birthday, phoneNumber)
         }
+
+        fun getName() = "$firstName $lastName"
 }
 
 data class UserDetail(
