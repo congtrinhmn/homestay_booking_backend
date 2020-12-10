@@ -64,7 +64,6 @@ class PlaceService(private val placeRepository: PlaceRepository,
             (placeRepository.findById(placeEntity.id).toNullable()
                     ?: throw PlaceNotFoundException(placeEntity.id)).apply {
                 placeEntity.reviewEntities = reviewEntities
-                placeEntity.status = status
                 placeEntity.userEntity = userEntity
             }
             placeRepository.save(placeEntity)
