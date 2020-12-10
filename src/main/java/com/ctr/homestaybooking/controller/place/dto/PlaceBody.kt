@@ -73,6 +73,8 @@ data class PlaceBody(
         @Enumerated(EnumType.STRING)
         var submitStatus: SubmitStatus = SubmitStatus.DRAFT,
 
+        var status: PlaceStatus = PlaceStatus.UNLISTED,
+
         var images: List<String>?,
 
         var amenities: List<Int>?,
@@ -112,7 +114,7 @@ data class PlaceBody(
             latestCheckInTime = latestCheckInTime,
             checkOutTime = checkOutTime,
             submitStatus = submitStatus,
-            status = PlaceStatus.UNLISTED,
+            status = status,
             imageEntities = images?.map { ImageEntity(url = it) }?.toSet(),
             amenityEntities = amenities?.map { amenityService.getAmenityById(it) }?.toSet(),
             bookingSlotEntities = bookingSlots?.map { BookingSlotEntity(0, it.date, it.status) }?.toMutableSet()
