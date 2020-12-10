@@ -24,7 +24,7 @@ class UserEntity(
         @Column(nullable = false, unique = true)
         var uuid: String,
 
-        @Column(nullable = true, unique = true)
+        @Column(nullable = true, unique = false)
         var deviceToken: String,
 
         @Column(nullable = false)
