@@ -73,7 +73,6 @@ data class PlaceBody(
         @Enumerated(EnumType.STRING)
         var submitStatus: SubmitStatus = SubmitStatus.DRAFT,
 
-        @Enumerated(EnumType.STRING)
         var status: PlaceStatus = PlaceStatus.UNLISTED,
 
         var images: List<String>?,

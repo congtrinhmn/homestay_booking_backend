@@ -6,6 +6,6 @@ package com.ctr.homestaybooking.shared.enums
 
 enum class CancelType {
     FLEXIBLE,
-    TYPE_2,
-    TYPE_3
+    MODERATE,
+    STRICT
 }

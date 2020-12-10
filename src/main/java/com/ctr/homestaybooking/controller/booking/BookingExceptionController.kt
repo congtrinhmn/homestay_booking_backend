@@ -23,19 +23,29 @@ class BookingExceptionController {
         return Response.buildResponseError(ApiError(HttpStatus.CONFLICT, exception))
     }
 
-    @ExceptionHandler(value = [ConflictException::class])
-    fun exception(exception: ConflictException): ResponseEntity<Any> {
-        return Response.buildResponseError(ApiError(HttpStatus.CONFLICT, exception))
+    @ExceptionHandler(value = [MessageException::class])
+    fun exception(exception: MessageException): ResponseEntity<Any> {
+        return Response.buildResponseError(ApiError(HttpStatus.BAD_REQUEST, exception))
     }
 
     @ExceptionHandler(value = [BookingIsNotExistsException::class])
     fun exception(exception: BookingIsNotExistsException): ResponseEntity<Any> {
-        return Response.buildResponseError(ApiError(HttpStatus.BAD_GATEWAY, exception))
+        return Response.buildResponseError(ApiError(HttpStatus.BAD_REQUEST, exception))
     }
 
     @ExceptionHandler(value = [MethodNotAllowedException::class])
     fun exception(exception: MethodNotAllowedException): ResponseEntity<Any> {
-        return Response.buildResponseError(ApiError(HttpStatus.METHOD_NOT_ALLOWED, exception))
+        return Response.buildResponseError(ApiError(HttpStatus.FORBIDDEN, exception))
+    }
+
+    @ExceptionHandler(value = [PaymentRequiredException::class])
+    fun exception(exception: PaymentRequiredException): ResponseEntity<Any> {
+        return Response.buildResponseError(ApiError(HttpStatus.PAYMENT_REQUIRED, exception))
+    }
+
+    @ExceptionHandler(value = [MethodNotSuccess::class])
+    fun exception(exception: MethodNotSuccess): ResponseEntity<Any> {
+        return Response.buildResponseError(ApiError(HttpStatus.FORBIDDEN, exception))
     }
 }
 
@@ -47,4 +57,8 @@ class BookingIsNotExistsException(id: Int) : RuntimeException("Booking is not ex
 
 class MethodNotAllowedException : RuntimeException("Method not allowed")
 
-class ConflictException(message: String?) : RuntimeException(message)
+class PaymentRequiredException : RuntimeException("Payment required")
+
+class MethodNotSuccess : RuntimeException("Không thể tạo yêu cầu thanh toán từ MoMo. Vui lòng thử lại!")
+
+class MessageException(message: String?) : RuntimeException(message)

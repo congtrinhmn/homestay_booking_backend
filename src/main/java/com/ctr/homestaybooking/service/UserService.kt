@@ -53,7 +53,7 @@ class UserService(private val userRepository: UserRepository,
         val userGetFromDatabase = userRepository.findByEmail(user.email)
                 ?: throw UserIsNotExistsException(user.id)
         user = holdValueDefault(user, userGetFromDatabase)
-        user.password = BCryptPasswordEncoder().encode(user.password)
+        user.password = userGetFromDatabase.password
         userRepository.save(user)
         return userRepository.findById(user.id).get()
     }

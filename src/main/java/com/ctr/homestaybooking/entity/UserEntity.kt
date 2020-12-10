@@ -24,7 +24,7 @@ class UserEntity(
         @Column(nullable = false, unique = true)
         var uuid: String,
 
-        @Column(nullable = false, unique = true)
+        @Column(nullable = true, unique = false)
         var deviceToken: String,
 
         @Column(nullable = false)
@@ -63,6 +63,8 @@ class UserEntity(
         fun toUserDetail(): UserDetail {
                 return UserDetail(id, email, uuid, deviceToken, roleEntities.map { it.name }.toSet(), imageUrl, firstName, lastName, gender, birthday, phoneNumber)
         }
+
+        fun getName() = "$firstName $lastName"
 }
 
 data class UserDetail(

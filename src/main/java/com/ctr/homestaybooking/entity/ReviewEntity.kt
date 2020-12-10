@@ -2,8 +2,6 @@ package com.ctr.homestaybooking.entity
 
 import com.ctr.homestaybooking.controller.place.dto.PlaceDetail
 import com.ctr.homestaybooking.service.BookingService
-import com.ctr.homestaybooking.service.PlaceService
-import com.ctr.homestaybooking.service.UserService
 import com.ctr.homestaybooking.shared.FORMAT_DATE_TIME
 import com.ctr.homestaybooking.shared.enums.ReviewStatus
 import org.springframework.format.annotation.DateTimeFormat
@@ -70,17 +68,15 @@ data class ReviewBody(
         var comment: String,
         var rating: Int,
         var createDate: Date,
-        var userId: Int,
-        var placeId: Int,
         var bookingId: Int
 ) {
-    fun toReviewEntity(userService: UserService, placeService: PlaceService, bookingService: BookingService) = ReviewEntity(
+    fun toReviewEntity(bookingService: BookingService) = ReviewEntity(
             id = id,
             comment = comment,
             rating = rating,
             createDate = createDate,
-            userEntity = userService.getUserById(userId),
-            placeEntity = placeService.getPlaceByID(placeId),
+            userEntity = bookingService.getBookingById(bookingId).userEntity,
+            placeEntity = bookingService.getBookingById(bookingId).placeEntity,
             bookingEntity = bookingService.getBookingById(bookingId)
     )
 }

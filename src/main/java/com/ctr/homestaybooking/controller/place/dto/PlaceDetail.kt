@@ -63,7 +63,7 @@ data class PlaceDetail(
 
         var wardDetail: WardDetail?,
 
-        var placeType: String?,
+        var placeType: PlaceType?,
 
         var promos: List<Promo>?,
 
