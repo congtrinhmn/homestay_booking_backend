@@ -81,4 +81,10 @@ class PlaceController(private val placeService: PlaceService,
     fun getRecommendPlacesForUser(@PathVariable("id") id: Int): ApiData<List<Place>> {
         return ApiData(placeService.getRecommendPlaceForUser(id).map { it.toPlace() })
     }
+
+    @GetMapping("/{id}/calendar")
+    @ApiOperation(value = "Get recommend places for user")
+    fun getCalendarById(@PathVariable("id") id: Int): ApiData<String> {
+        return ApiData(placeService.getCalendarById(id))
+    }
 }

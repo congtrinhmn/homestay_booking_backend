@@ -8,6 +8,7 @@ import com.ctr.homestaybooking.entity.BookingSlotEntity
 import com.ctr.homestaybooking.entity.PlaceEntity
 import com.ctr.homestaybooking.entity.UserEntity
 import com.ctr.homestaybooking.entity.WardEntity
+import com.ctr.homestaybooking.repository.BookingRepository
 import com.ctr.homestaybooking.repository.PlaceRepository
 import com.ctr.homestaybooking.repository.UserRepository
 import com.ctr.homestaybooking.shared.BASE_URL_RECOMMEND
@@ -29,7 +30,8 @@ import java.util.*
  */
 @Service
 class PlaceService(private val placeRepository: PlaceRepository,
-                   private val userRepository: UserRepository
+                   private val userRepository: UserRepository,
+                   private val bookingRepository: BookingRepository
 ) {
 
     fun getAllPlace(page: Int, size: Int, sortBy: String): List<PlaceEntity> {
@@ -84,6 +86,7 @@ class PlaceService(private val placeRepository: PlaceRepository,
             // add booking date if bookingSlots don't have
             bookingDates.forEach {
                 if (!dates.isContain(it)) {
+
                     add(BookingSlotEntity(date = it))
                 }
             }
@@ -108,4 +111,42 @@ class PlaceService(private val placeRepository: PlaceRepository,
                 }
         return listOf()
     }
+
+    fun getCalendarById(id: Int): String {
+        /*val placeEntity = placeRepository.findById(id).toNullable() ?: throw PlaceNotFoundException(id)
+        placeEntity.apply {
+            val calFile = "place_$id.ics"
+
+            val calendar = net.fortuna.ical4j.model.Calendar()
+            calendar.properties.add(ProdId("-//Homestay Booking//iCal4j 1.0//EN"))
+            calendar.properties.add(Version.VERSION_2_0)
+            calendar.properties.add(CalScale.GREGORIAN)
+
+            val cal = Calendar.getInstance()
+            cal[Calendar.MONTH] = Calendar.DECEMBER
+            cal[Calendar.DAY_OF_MONTH] = 25
+
+            val christmas = VEvent(net.fortuna.ical4j.model.Date(cal.time),
+                    net.fortuna.ical4j.model.Date(cal.time),
+                    "Christmas Day")
+
+            val uidGenerator = UidGenerator { Uid("id") }
+            christmas.properties.add(uidGenerator.generateUid())
+//        melbourneCup.properties.add(uidGenerator.generateUid())
+
+            calendar.components.add(christmas)
+
+            //Saving an iCalendar file
+
+            //Saving an iCalendar file
+            val fout = FileOutputStream(calFile)
+
+            val outputter = CalendarOutputter()
+            outputter.isValidating = false
+            outputter.output(calendar, fout)
+        }*/
+        return ""
+    }
+
 }
+

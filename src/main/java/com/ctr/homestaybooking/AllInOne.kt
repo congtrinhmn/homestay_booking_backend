@@ -1,13 +1,21 @@
 package com.ctr.homestaybooking
 
 import com.google.gson.Gson
-import com.mservice.allinone.processor.allinone.CaptureMoMo
-import com.mservice.allinone.processor.allinone.QueryStatusTransaction
 import com.mservice.shared.constants.Parameter
 import com.mservice.shared.sharedmodels.Environment
 import com.mservice.shared.utils.Encoder
+import net.fortuna.ical4j.data.CalendarOutputter
+import net.fortuna.ical4j.model.Date
+import net.fortuna.ical4j.model.component.VEvent
+import net.fortuna.ical4j.model.property.CalScale
+import net.fortuna.ical4j.model.property.ProdId
+import net.fortuna.ical4j.model.property.Uid
+import net.fortuna.ical4j.model.property.Version
+import net.fortuna.ical4j.util.UidGenerator
+import java.io.FileOutputStream
 import java.nio.charset.StandardCharsets
 import java.util.*
+
 
 /**
  * Demo
@@ -34,12 +42,13 @@ object AllInOne {
         val customerNumber = "0963181714"
         val environment = Environment.selectEnv(Environment.EnvTarget.DEV, Environment.ProcessType.PAY_GATE)
 
+        calendar()
 //          Please uncomment the code to actually use the necessary All-In-One gateway payment processes
 //          Remember to change the IDs
-        val captureMoMoResponse = CaptureMoMo.process(environment, orderId, orderId, java.lang.Long.toString(amount), orderInfo, returnURL, notifyURL, extraData)
-        println("--= " + captureMoMoResponse)
-        val queryStatusTransactionResponse = QueryStatusTransaction.process(environment, orderId, orderId)
-        println("--= " + queryStatusTransactionResponse)
+//        val captureMoMoResponse = CaptureMoMo.process(environment, orderId, orderId, java.lang.Long.toString(amount), orderInfo, returnURL, notifyURL, extraData)
+//        println("--= " + captureMoMoResponse)
+//        val queryStatusTransactionResponse = QueryStatusTransaction.process(environment, orderId, orderId)
+//        println("--= " + queryStatusTransactionResponse)
 
 //          Refund -- Manual Testing
 //            RefundMoMoResponse response = RefundMoMo.process(environment, "1562135830002", orderId, "10000", "2304963912");
@@ -61,6 +70,81 @@ object AllInOne {
 //        RefundATM.process(environment, orderId, "1561972550332", "10000", "2304962904", bankCode);
 //        RefundStatus.process(environment, "1562135830002", "1561972787557");
 //
+    }
+
+    private fun calendar() {
+        val calFile = "mycalendar.ics"
+
+        //Creating a new calendar
+
+        //Creating a new calendar
+        var calendar = net.fortuna.ical4j.model.Calendar()
+        calendar.properties.add(ProdId("-//Homestay Booking//iCal4j 1.0//EN"))
+        calendar.properties.add(Version.VERSION_2_0)
+        calendar.properties.add(CalScale.GREGORIAN)
+
+//        val registry = TimeZoneRegistryFactory.getInstance().createRegistry()
+//        val timezone: TimeZone = registry.getTimeZone("Australia/Melbourne")
+
+//        val cal = Calendar.getInstance()
+//        cal[Calendar.YEAR] = 2005
+//        cal[Calendar.MONTH] = Calendar.NOVEMBER
+//        cal[Calendar.DAY_OF_MONTH] = 1
+//        cal[Calendar.HOUR_OF_DAY] = 15
+//        cal.clear(Calendar.MINUTE)
+//        cal.clear(Calendar.SECOND)
+//
+//        val dt = DateTime(cal.time)
+//        val melbourneCup = VEvent(dt, "Melbourne Cup")
+
+        //Creating an event
+
+        //Creating an event
+        val cal = Calendar.getInstance()
+        cal[Calendar.MONTH] = Calendar.DECEMBER
+        cal[Calendar.DAY_OF_MONTH] = 25
+
+        val christmas = VEvent(Date(cal.time), Date(cal.time), "Christmas Day")
+        // initialise as an all-day event..
+        // initialise as an all-day event..
+//        christmas.properties.getProperty<Property>(Property.DTSTART).parameters.add(Value.DATE)
+
+        val uidGenerator = UidGenerator { Uid("id") }
+        christmas.properties.add(uidGenerator.generateUid())
+//        melbourneCup.properties.add(uidGenerator.generateUid())
+
+        calendar.components.add(christmas)
+
+        //Saving an iCalendar file
+
+        //Saving an iCalendar file
+        val fout = FileOutputStream(calFile)
+
+        val outputter = CalendarOutputter()
+        outputter.isValidating = false
+        outputter.output(calendar, fout)
+
+        //Now Parsing an iCalendar file
+
+        /*//Now Parsing an iCalendar file
+        val fin = FileInputStream(calFile)
+
+        val builder = CalendarBuilder()
+
+        var calendare = builder.build(fin)
+
+        val i: Iterator<*> = calendare.components.iterator()
+        while (i.hasNext()) {
+            val component: Component = i.next() as Component
+            println("Component [" + component.name.toString() + "]")
+            val j: Iterator<*> = component.properties.iterator()
+            while (j.hasNext()) {
+                val property = j.next() as Property
+                println("Property [" + property.name + ", " + property.value + "]")
+            }
+        }*/
+
+
     }
 
     //generate RSA signature from given information

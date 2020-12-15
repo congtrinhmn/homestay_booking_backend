@@ -104,7 +104,41 @@ class BookingService(private val bookingRepository: BookingRepository,
         val bookingEntity = bookingRepository.findById(id).toNullable() ?: throw BookingNotFoundException(id)
         if (bookingStatus == BookingStatus.PAID) throw MethodNotAllowedException()
         bookingEntity.bookingStatus = bookingStatus
-        return bookingRepository.save(bookingEntity)
+        return bookingRepository.save(bookingEntity).apply {
+            when (bookingStatus) {
+                BookingStatus.ACCEPTED -> {
+                    placeEntity.userEntity?.deviceToken?.let {
+                        fcmService.pushNotification(FirebaseMessage(
+                                "${placeEntity.userEntity?.getName()} đã chấp nhận yêu cầu đặt chỗ ${this.id}, thanh toán ngay!",
+                                "${placeEntity.name}",
+                                it,
+                                mapOf("bookingId" to id).toJsonString()
+                        ))
+                    }
+                }
+                BookingStatus.CANCELLED -> {
+                    placeEntity.userEntity?.deviceToken?.let {
+                        fcmService.pushNotification(FirebaseMessage(
+                                "Đơn đặt chỗ ${this.id} đã bị hủy",
+                                "${placeEntity.name}",
+                                it,
+                                mapOf("bookingId" to id).toJsonString()
+                        ))
+                    }
+                    userEntity.deviceToken.let {
+                        fcmService.pushNotification(FirebaseMessage(
+                                "Đơn đặt chỗ ${this.id} đã bị hủy",
+                                "${placeEntity.name}",
+                                it,
+                                mapOf("bookingId" to id).toJsonString()
+                        ))
+                    }
+                }
+                else -> {
+
+                }
+            }
+        }
     }
 
     fun deleteBookingByID(id: Int) {
@@ -178,8 +212,18 @@ class BookingService(private val bookingRepository: BookingRepository,
             }
         }
         return bookingRepository.save(bookingEntity).apply {
-            val bookingDates = startDate.datesUntil(endDate)
-            placeService.updateBookingSlotById(placeEntity.id, bookingDates)
+            if (errorCode == 0) {
+                val bookingDates = startDate.datesUntil(endDate)
+                placeService.updateBookingSlotById(placeEntity.id, bookingDates)
+                placeEntity.userEntity?.deviceToken?.let {
+                    fcmService.pushNotification(FirebaseMessage(
+                            "${userEntity.getName()} đã thanh toán đơn đặt chỗ ${this.id} ",
+                            "${placeEntity.name}",
+                            it,
+                            mapOf("bookingId" to id).toJsonString()
+                    ))
+                }
+            }
         }
     }
 

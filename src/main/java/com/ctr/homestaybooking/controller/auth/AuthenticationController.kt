@@ -50,7 +50,10 @@ class AuthenticationController(private val authenticationManager: Authentication
                         )
                 )
                 SecurityContextHolder.getContext().authentication = authentication
-                val token = jwtTokenUtil.generateToken(authentication)
+                var token = jwtTokenUtil.generateToken(authentication)
+                userService.editUser(userService.getUserByEmail(email = login.email).apply {
+                    deviceToken = login.deviceToken
+                })
                 ResponseEntity.ok(AuthToken(userService.getUserByEmail(login.email).toUserDetail(), token))
             } catch (e: Exception) {
                 throw PasswordLoginFailedException()

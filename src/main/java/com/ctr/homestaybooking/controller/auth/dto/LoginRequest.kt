@@ -12,5 +12,7 @@ data class LoginRequest(
 
         @field: NotBlank(message = NOT_BLANK_PASSWORD)
         @field: Pattern(regexp = PATTERN_PASSWORD, message = ERROR_PASSWORD)
-        val password: String
+        val password: String,
+
+        val deviceToken: String
 )
