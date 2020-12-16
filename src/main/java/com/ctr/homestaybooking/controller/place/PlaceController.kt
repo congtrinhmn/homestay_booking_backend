@@ -3,6 +3,7 @@ package com.ctr.homestaybooking.controller.place
 import com.ctr.homestaybooking.controller.place.dto.Place
 import com.ctr.homestaybooking.controller.place.dto.PlaceBody
 import com.ctr.homestaybooking.controller.place.dto.PlaceDetail
+import com.ctr.homestaybooking.entity.BookingDetail
 import com.ctr.homestaybooking.service.*
 import com.ctr.homestaybooking.shared.ROLE_ADMIN
 import com.ctr.homestaybooking.shared.ROLE_HOST
@@ -80,6 +81,12 @@ class PlaceController(private val placeService: PlaceService,
     @ApiOperation(value = "Get recommend places for user")
     fun getRecommendPlacesForUser(@PathVariable("id") id: Int): ApiData<List<Place>> {
         return ApiData(placeService.getRecommendPlaceForUser(id).map { it.toPlace() })
+    }
+
+    @GetMapping("/{id}/booking")
+    @ApiOperation(value = "Get recommend places for user")
+    fun getBookingByPlaceId(@PathVariable("id") id: Int): ApiData<List<BookingDetail>> {
+        return ApiData(placeService.getBookingByPlaceId(id).map { it.toBookingDetail() })
     }
 
     @GetMapping("/{id}/calendar")

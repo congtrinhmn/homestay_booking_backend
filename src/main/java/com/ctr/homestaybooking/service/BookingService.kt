@@ -50,10 +50,10 @@ class BookingService(private val bookingRepository: BookingRepository,
             // check booking dates is available
             val bookingDates = startDate.datesUntil(endDate)
             placeService.getPlaceByID(bookingEntity.placeEntity.id).let { place ->
-                val availableDates = place.bookingSlotEntities?.filter { it.status == DateStatus.AVAILABLE }?.map { it.date }
+                val unavailableDates = place.bookingSlotEntities?.filter { it.status == DateStatus.UNAVAILABLE }?.map { it.date }
                         ?: listOf()
-                if (!availableDates.isContainAll(bookingDates)) {
-                    throw MessageException("Booking dates is unavailable")
+                if (unavailableDates.isContainAll(bookingDates)) {
+                    throw MessageException("Ngày đặt chỗ không có sẵn.")
                 }
 
                 // check promo is valid
@@ -72,12 +72,12 @@ class BookingService(private val bookingRepository: BookingRepository,
                 }
             }
 
-            if (bookingEntity.placeEntity.userEntity?.id == bookingEntity.userEntity.id) {
+            if (bookingEntity.placeEntity.hostEntity?.id == bookingEntity.userEntity.id) {
                 throw MessageException("Can't book your place!")
             }
 
             return bookingRepository.save(bookingEntity).apply {
-                placeEntity.userEntity?.deviceToken?.let {
+                placeEntity.hostEntity?.deviceToken?.let {
                     fcmService.pushNotification(FirebaseMessage(
                             if (placeEntity.bookingType == BookingType.INSTANT_BOOKING) {
                                 "Bạn có đơn đặt chỗ mới từ ${userEntity.getName()}"
@@ -107,9 +107,9 @@ class BookingService(private val bookingRepository: BookingRepository,
         return bookingRepository.save(bookingEntity).apply {
             when (bookingStatus) {
                 BookingStatus.ACCEPTED -> {
-                    placeEntity.userEntity?.deviceToken?.let {
+                    userEntity.deviceToken.let {
                         fcmService.pushNotification(FirebaseMessage(
-                                "${placeEntity.userEntity?.getName()} đã chấp nhận yêu cầu đặt chỗ ${this.id}, thanh toán ngay!",
+                                "${placeEntity.hostEntity?.getName()} đã chấp nhận yêu cầu đặt chỗ ${this.id}, thanh toán ngay!",
                                 "${placeEntity.name}",
                                 it,
                                 mapOf("bookingId" to id).toJsonString()
@@ -117,7 +117,7 @@ class BookingService(private val bookingRepository: BookingRepository,
                     }
                 }
                 BookingStatus.CANCELLED -> {
-                    placeEntity.userEntity?.deviceToken?.let {
+                    placeEntity.hostEntity?.deviceToken?.let {
                         fcmService.pushNotification(FirebaseMessage(
                                 "Đơn đặt chỗ ${this.id} đã bị hủy",
                                 "${placeEntity.name}",
@@ -152,10 +152,10 @@ class BookingService(private val bookingRepository: BookingRepository,
         bookingEntity.apply {
             val bookingDates = startDate.datesUntil(endDate)
             placeEntity.let { place ->
-                val availableDates = place.bookingSlotEntities?.filter { it.status == DateStatus.AVAILABLE }?.map { it.date }
+                val unavailableDates = place.bookingSlotEntities?.filter { it.status == DateStatus.UNAVAILABLE }?.map { it.date }
                         ?: listOf()
-                if (!availableDates.isContainAll(bookingDates)) {
-                    throw MessageException("Booking dates is booked by another user. Please use")
+                if (unavailableDates.isContainAll(bookingDates)) {
+                    throw MessageException("Ngày đặt phòng không có sẵn.")
                 }
             }
             if (bookingStatus != BookingStatus.ACCEPTED && bookingStatus != BookingStatus.UNPAID) {
@@ -215,7 +215,7 @@ class BookingService(private val bookingRepository: BookingRepository,
             if (errorCode == 0) {
                 val bookingDates = startDate.datesUntil(endDate)
                 placeService.updateBookingSlotById(placeEntity.id, bookingDates)
-                placeEntity.userEntity?.deviceToken?.let {
+                placeEntity.hostEntity?.deviceToken?.let {
                     fcmService.pushNotification(FirebaseMessage(
                             "${userEntity.getName()} đã thanh toán đơn đặt chỗ ${this.id} ",
                             "${placeEntity.name}",

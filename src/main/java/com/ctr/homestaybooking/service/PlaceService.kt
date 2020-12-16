@@ -4,10 +4,7 @@ import com.ctr.homestaybooking.config.NotFoundException
 import com.ctr.homestaybooking.controller.place.PlaceNotFoundException
 import com.ctr.homestaybooking.controller.place.dto.RecommendResponse
 import com.ctr.homestaybooking.controller.user.UserNotFoundException
-import com.ctr.homestaybooking.entity.BookingSlotEntity
-import com.ctr.homestaybooking.entity.PlaceEntity
-import com.ctr.homestaybooking.entity.UserEntity
-import com.ctr.homestaybooking.entity.WardEntity
+import com.ctr.homestaybooking.entity.*
 import com.ctr.homestaybooking.repository.BookingRepository
 import com.ctr.homestaybooking.repository.PlaceRepository
 import com.ctr.homestaybooking.repository.UserRepository
@@ -42,6 +39,9 @@ class PlaceService(private val placeRepository: PlaceRepository,
     fun getPlaceByID(id: Int): PlaceEntity =
             placeRepository.findById(id).toNullable() ?: throw  PlaceNotFoundException(id)
 
+    fun getBookingByPlaceId(id: Int): List<BookingEntity> =
+            placeRepository.findById(id).toNullable()?.bookingEntities?.toList() ?: throw  PlaceNotFoundException(id)
+
     fun getPlacesByIDs(ids: Set<Int>) =
             placeRepository.findAllById(ids).filterIsInstance<PlaceEntity>().toSet()
 
@@ -66,7 +66,8 @@ class PlaceService(private val placeRepository: PlaceRepository,
             (placeRepository.findById(placeEntity.id).toNullable()
                     ?: throw PlaceNotFoundException(placeEntity.id)).apply {
                 placeEntity.reviewEntities = reviewEntities
-                placeEntity.userEntity = userEntity
+                placeEntity.bookingEntities = bookingEntities
+                placeEntity.hostEntity = hostEntity
             }
             placeRepository.save(placeEntity)
         }
