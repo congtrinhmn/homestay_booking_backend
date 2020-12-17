@@ -14,10 +14,7 @@ import com.ctr.homestaybooking.shared.enums.PlaceStatus
 import com.google.gson.Gson
 import net.fortuna.ical4j.data.CalendarOutputter
 import net.fortuna.ical4j.model.component.VEvent
-import net.fortuna.ical4j.model.property.CalScale
-import net.fortuna.ical4j.model.property.ProdId
-import net.fortuna.ical4j.model.property.Uid
-import net.fortuna.ical4j.model.property.Version
+import net.fortuna.ical4j.model.property.*
 import net.fortuna.ical4j.util.UidGenerator
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
@@ -136,9 +133,14 @@ class PlaceService(private val placeRepository: PlaceRepository,
                 val event = VEvent(net.fortuna.ical4j.model.Date(it.startDate.add(1)),
                         net.fortuna.ical4j.model.Date(it.endDate.add(1)),
                         "Đơn đặt chỗ mã ${it.id} của ${it.userEntity.getName()} ${it.totalPaid}đ")
-                event.properties.add(UidGenerator {
-                    Uid("${it.startDate.format(FORMAT_DATE)}-${it.endDate.add(-1).format(FORMAT_DATE)}-${id}-homestay-booking")
-                }.generateUid())
+                event.properties.apply {
+                    add(UidGenerator {
+                        Uid("${it.startDate.format(FORMAT_DATE)}-${it.endDate.add(-1).format(FORMAT_DATE)}-${id}-homestay-booking")
+                    }.generateUid())
+                    add(Contact(it.userEntity.phoneNumber))
+                    add(Description(name))
+                    add(Location(address))
+                }
                 iCalendar.components.add(event)
             }
 
@@ -151,9 +153,11 @@ class PlaceService(private val placeRepository: PlaceRepository,
                             val event = VEvent(net.fortuna.ical4j.model.Date(it.first().add(1)),
                                     net.fortuna.ical4j.model.Date(it.last().add(2)),
                                     "Không có sẵn")
-                            event.properties.add(UidGenerator {
-                                Uid("${it.firstOrNull()?.format(FORMAT_DATE)}-${it.lastOrNull()?.format(FORMAT_DATE)}-${id}-homestay-booking")
-                            }.generateUid())
+                            event.properties.apply {
+                                add(UidGenerator { Uid("${it.firstOrNull()?.format(FORMAT_DATE)}-${it.lastOrNull()?.format(FORMAT_DATE)}-${id}-homestay-booking") }.generateUid())
+                                add(Description(name))
+                                add(Location(address))
+                            }
                             iCalendar.components.add(event)
                         }
                     }
