@@ -90,7 +90,7 @@ class PlaceController(private val placeService: PlaceService,
     }
 
     @GetMapping("/{id}/calendar")
-    @ApiOperation(value = "Get recommend places for user")
+    @ApiOperation(value = "Get calendar of place")
     fun getCalendarById(@PathVariable("id") id: Int): ApiData<String> {
         return ApiData(placeService.getCalendarById(id))
     }

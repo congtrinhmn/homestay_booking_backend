@@ -147,15 +147,16 @@ class PlaceService(private val placeRepository: PlaceRepository,
                     ?.consecutive()
                     ?.apply { log.info { this } }
                     ?.forEach {
-                        val event = VEvent(net.fortuna.ical4j.model.Date(it.first().add(1)),
-                                net.fortuna.ical4j.model.Date(it.last().add(2)),
-                                "Không có sẵn")
-                        event.properties.add(UidGenerator {
-                            Uid("${it.firstOrNull()?.format(FORMAT_DATE)}-${it.lastOrNull()?.format(FORMAT_DATE)}-${id}-homestay-booking")
-                        }.generateUid())
-                        iCalendar.components.add(event)
+                        if (it.isNotEmpty()) {
+                            val event = VEvent(net.fortuna.ical4j.model.Date(it.first().add(1)),
+                                    net.fortuna.ical4j.model.Date(it.last().add(2)),
+                                    "Không có sẵn")
+                            event.properties.add(UidGenerator {
+                                Uid("${it.firstOrNull()?.format(FORMAT_DATE)}-${it.lastOrNull()?.format(FORMAT_DATE)}-${id}-homestay-booking")
+                            }.generateUid())
+                            iCalendar.components.add(event)
+                        }
                     }
-
             val fout = FileOutputStream(iCalendarName)
             val outputter = CalendarOutputter()
             outputter.isValidating = false
