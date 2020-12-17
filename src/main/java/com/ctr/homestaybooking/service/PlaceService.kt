@@ -8,17 +8,25 @@ import com.ctr.homestaybooking.entity.*
 import com.ctr.homestaybooking.repository.BookingRepository
 import com.ctr.homestaybooking.repository.PlaceRepository
 import com.ctr.homestaybooking.repository.UserRepository
-import com.ctr.homestaybooking.shared.BASE_URL_RECOMMEND
+import com.ctr.homestaybooking.shared.*
 import com.ctr.homestaybooking.shared.enums.DateStatus
 import com.ctr.homestaybooking.shared.enums.PlaceStatus
-import com.ctr.homestaybooking.shared.isContain
-import com.ctr.homestaybooking.shared.toNullable
 import com.google.gson.Gson
+import net.fortuna.ical4j.data.CalendarOutputter
+import net.fortuna.ical4j.model.component.VEvent
+import net.fortuna.ical4j.model.property.CalScale
+import net.fortuna.ical4j.model.property.ProdId
+import net.fortuna.ical4j.model.property.Uid
+import net.fortuna.ical4j.model.property.Version
+import net.fortuna.ical4j.util.UidGenerator
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Service
 import org.springframework.web.client.RestTemplate
+import java.io.File
+import java.io.FileInputStream
+import java.io.FileOutputStream
 import java.util.*
 
 
@@ -49,7 +57,7 @@ class PlaceService(private val placeRepository: PlaceRepository,
             placeRepository.findByWardEntity(wardEntity)
 
     fun getPlacesByUserEntity(userEntity: UserEntity): Set<PlaceEntity> =
-            placeRepository.findByUserEntity(userEntity)
+            placeRepository.findByHostEntity(userEntity)
 
     fun getPlacesByDistrictId(id: Int): Set<PlaceEntity> =
             placeRepository.findByDistrictId(id) ?: throw  NotFoundException("District", id)
@@ -87,7 +95,6 @@ class PlaceService(private val placeRepository: PlaceRepository,
             // add booking date if bookingSlots don't have
             bookingDates.forEach {
                 if (!dates.isContain(it)) {
-
                     add(BookingSlotEntity(date = it))
                 }
             }
@@ -114,40 +121,55 @@ class PlaceService(private val placeRepository: PlaceRepository,
     }
 
     fun getCalendarById(id: Int): String {
-        /*val placeEntity = placeRepository.findById(id).toNullable() ?: throw PlaceNotFoundException(id)
+        val placeEntity = placeRepository.findById(id).toNullable() ?: throw PlaceNotFoundException(id)
         placeEntity.apply {
-            val calFile = "place_$id.ics"
+            val iCalendarName = "place_$id.ics"
 
-            val calendar = net.fortuna.ical4j.model.Calendar()
-            calendar.properties.add(ProdId("-//Homestay Booking//iCal4j 1.0//EN"))
-            calendar.properties.add(Version.VERSION_2_0)
-            calendar.properties.add(CalScale.GREGORIAN)
+            val iCalendar = net.fortuna.ical4j.model.Calendar()
+            iCalendar.properties.apply {
+                add(ProdId("-//Homestay Booking//iCal4j 1.0//EN"))
+                add(Version.VERSION_2_0)
+                add(CalScale.GREGORIAN)
+            }
 
-            val cal = Calendar.getInstance()
-            cal[Calendar.MONTH] = Calendar.DECEMBER
-            cal[Calendar.DAY_OF_MONTH] = 25
+            getBookingByPlaceId(id).forEach {
+                val event = VEvent(net.fortuna.ical4j.model.Date(it.startDate.add(1)),
+                        net.fortuna.ical4j.model.Date(it.endDate.add(1)),
+                        "Đơn đặt chỗ mã ${it.id} của ${it.userEntity.getName()} ${it.totalPaid}đ")
+                event.properties.add(UidGenerator {
+                    Uid("${it.startDate.format(FORMAT_DATE)}-${it.endDate.add(-1).format(FORMAT_DATE)}-${id}-homestay-booking")
+                }.generateUid())
+                iCalendar.components.add(event)
+            }
 
-            val christmas = VEvent(net.fortuna.ical4j.model.Date(cal.time),
-                    net.fortuna.ical4j.model.Date(cal.time),
-                    "Christmas Day")
+            bookingSlotEntities?.filter { it.status == DateStatus.UNAVAILABLE }
+                    ?.map { it.date }
+                    ?.consecutive()
+                    ?.apply { log.info { this } }
+                    ?.forEach {
+                        val event = VEvent(net.fortuna.ical4j.model.Date(it.first().add(1)),
+                                net.fortuna.ical4j.model.Date(it.last().add(2)),
+                                "Không có sẵn")
+                        event.properties.add(UidGenerator {
+                            Uid("${it.firstOrNull()?.format(FORMAT_DATE)}-${it.lastOrNull()?.format(FORMAT_DATE)}-${id}-homestay-booking")
+                        }.generateUid())
+                        iCalendar.components.add(event)
+                    }
 
-            val uidGenerator = UidGenerator { Uid("id") }
-            christmas.properties.add(uidGenerator.generateUid())
-//        melbourneCup.properties.add(uidGenerator.generateUid())
-
-            calendar.components.add(christmas)
-
-            //Saving an iCalendar file
-
-            //Saving an iCalendar file
-            val fout = FileOutputStream(calFile)
-
+            val fout = FileOutputStream(iCalendarName)
             val outputter = CalendarOutputter()
             outputter.isValidating = false
-            outputter.output(calendar, fout)
-        }*/
-        return ""
-    }
+            outputter.output(iCalendar, fout)
 
+            val file = File(iCalendarName)
+            val fin = FileInputStream(file)
+
+            return Uploader.upload(iCalendarName, fin).apply {
+                fout.close()
+                fin.close()
+                file.delete()
+            }
+        }
+    }
 }
 

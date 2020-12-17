@@ -22,5 +22,5 @@ interface PlaceRepository : JpaRepository<PlaceEntity, Int>, JpaSpecificationExe
             where d.id = :id""", nativeQuery = true)
     fun findByDistrictId(id: Int): Set<PlaceEntity>?
 
-    fun findByUserEntity(userEntity: UserEntity): Set<PlaceEntity>
+    fun findByHostEntity(userEntity: UserEntity): Set<PlaceEntity>
 }

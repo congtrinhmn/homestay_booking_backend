@@ -22,8 +22,18 @@ fun Date.datesUntil(endDate: Date): MutableSet<Date> {
     return dates
 }
 
+fun Date.add(days: Int): Date {
+    val calendar: Calendar = parse(format())
+    calendar.add(Calendar.DATE, days)
+    return parseDate(calendar.format())
+}
+
 fun Date.isBefore(date: Date): Boolean {
     return TimeUnit.MILLISECONDS.toHours(date.time - this.time) >= 24
+}
+
+fun Date.isBeforeOneDate(date: Date): Boolean {
+    return TimeUnit.MILLISECONDS.toHours(date.time - this.time) == 24.toLong()
 }
 
 fun Iterable<Date>.isContain(date: Date): Boolean {
@@ -38,6 +48,25 @@ fun Iterable<Date>.isContainAll(dates: Iterable<Date>): Boolean {
         if (!isContain(it)) return false
     }
     return true
+}
+
+fun List<Date>.consecutive(): MutableList<MutableList<Date>> {
+    sortedBy { it.time }.apply {
+        val result = mutableListOf<MutableList<Date>>()
+        var temp = mutableListOf<Date>()
+        temp.add(firstOrNull() ?: return mutableListOf(mutableListOf()))
+        for (i in 0 until this.size - 1) {
+            if (this[i].isBeforeOneDate(this[i + 1])) {
+                temp.add(this[i + 1])
+            } else {
+                result.add(temp)
+                temp = mutableListOf<Date>()
+                temp.add(this[i + 1])
+            }
+        }
+        result.add(temp)
+        return result.apply { log.info { this } }
+    }
 }
 
 fun parseDate(targetString: String, format: String = FORMAT_DATE_TIME): Date {

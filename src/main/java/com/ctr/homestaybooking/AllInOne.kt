@@ -1,6 +1,7 @@
 package com.ctr.homestaybooking
 
 import com.google.gson.Gson
+import com.mservice.allinone.processor.allinone.CaptureMoMo
 import com.mservice.shared.constants.Parameter
 import com.mservice.shared.sharedmodels.Environment
 import com.mservice.shared.utils.Encoder
@@ -45,7 +46,7 @@ object AllInOne {
         calendar()
 //          Please uncomment the code to actually use the necessary All-In-One gateway payment processes
 //          Remember to change the IDs
-//        val captureMoMoResponse = CaptureMoMo.process(environment, orderId, orderId, java.lang.Long.toString(amount), orderInfo, returnURL, notifyURL, extraData)
+        val captureMoMoResponse = CaptureMoMo.process(environment, orderId, orderId, java.lang.Long.toString(amount), orderInfo, returnURL, notifyURL, extraData)
 //        println("--= " + captureMoMoResponse)
 //        val queryStatusTransactionResponse = QueryStatusTransaction.process(environment, orderId, orderId)
 //        println("--= " + queryStatusTransactionResponse)
