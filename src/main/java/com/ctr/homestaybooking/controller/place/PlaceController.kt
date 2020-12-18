@@ -73,15 +73,15 @@ class PlaceController(private val placeService: PlaceService,
     @Secured(ROLE_ADMIN, ROLE_HOST)
     @DeleteMapping("/{id}")
     @ApiOperation(value = "Delete a place by id")
-    fun deletePlace(@PathVariable("id") id: Int) {
-        placeService.deletePlaceByID(id)
+    fun deletePlace(@PathVariable("id") id: Int): ApiData<PlaceDetail> {
+        return ApiData(placeService.deletePlaceByID(id).toPlaceDetail())
     }
 
     @Secured(ROLE_ADMIN, ROLE_HOST)
     @PatchMapping("/{id}/status")
     @ApiOperation(value = "Reverse place status by id")
-    fun reversePlaceStatusByID(@PathVariable("id") id: Int) {
-        placeService.reversePlaceStatusByID(id)
+    fun reversePlaceStatusByID(@PathVariable("id") id: Int): ApiData<PlaceDetail> {
+        return ApiData(placeService.reversePlaceStatusByID(id).toPlaceDetail())
     }
 
     @GetMapping("/recommend/{id}")
