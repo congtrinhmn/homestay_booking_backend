@@ -53,8 +53,8 @@ class PlaceService(private val placeRepository: PlaceRepository,
     fun getPlacesByWardEntity(wardEntity: WardEntity): Set<PlaceEntity> =
             placeRepository.findByWardEntity(wardEntity)
 
-    fun getPlacesByUserEntity(userEntity: UserEntity): Set<PlaceEntity> =
-            placeRepository.findByHostEntity(userEntity)
+    fun getPlacesByUserEntity(userEntity: UserEntity): List<PlaceEntity> =
+            placeRepository.findByHostEntity(userEntity).filter { it.status != PlaceStatus.DELETED }
 
     fun getPlacesByDistrictId(id: Int): Set<PlaceEntity> =
             placeRepository.findByDistrictId(id) ?: throw  NotFoundException("District", id)
@@ -82,6 +82,17 @@ class PlaceService(private val placeRepository: PlaceRepository,
         val placeEntity: PlaceEntity = placeRepository.findById(id).toNullable()
                 ?: throw PlaceNotFoundException(id)
         placeEntity.status = PlaceStatus.DELETED
+        return placeRepository.save(placeEntity)
+    }
+
+    fun reversePlaceStatusByID(id: Int): PlaceEntity {
+        val placeEntity: PlaceEntity = placeRepository.findById(id).toNullable()
+                ?: throw PlaceNotFoundException(id)
+        if (placeEntity.status == PlaceStatus.UNLISTED) {
+            placeEntity.status = PlaceStatus.LISTED
+        } else {
+            placeEntity.status = PlaceStatus.UNLISTED
+        }
         return placeRepository.save(placeEntity)
     }
 

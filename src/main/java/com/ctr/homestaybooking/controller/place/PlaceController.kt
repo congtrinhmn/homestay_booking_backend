@@ -77,6 +77,13 @@ class PlaceController(private val placeService: PlaceService,
         placeService.deletePlaceByID(id)
     }
 
+    @Secured(ROLE_ADMIN, ROLE_HOST)
+    @PatchMapping("/{id}/status")
+    @ApiOperation(value = "Reverse place status by id")
+    fun reversePlaceStatusByID(@PathVariable("id") id: Int) {
+        placeService.reversePlaceStatusByID(id)
+    }
+
     @GetMapping("/recommend/{id}")
     @ApiOperation(value = "Get recommend places for user")
     fun getRecommendPlacesForUser(@PathVariable("id") id: Int): ApiData<List<Place>> {
