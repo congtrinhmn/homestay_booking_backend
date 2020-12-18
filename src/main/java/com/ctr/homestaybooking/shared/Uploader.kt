@@ -21,6 +21,7 @@ object Uploader {
                 .setProjectId("ctr-homestaybooking")
                 .setCredentials(GoogleCredentials.fromStream(serviceAccount))
                 .build().service
+        val bucket = storage.get("ctr-homestaybooking.appspot.com").toBuilder().setVersioningEnabled(false).build().update()
         val blob = storage.create(BlobInfo.newBuilder(
                 BlobId.of("ctr-homestaybooking.appspot.com", "calendars/$fileName")).build(),
                 fileInputStream.readBytes(),
