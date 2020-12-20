@@ -88,7 +88,7 @@ class PlaceEntity(
 
         @ManyToOne
         @JoinColumn(name = "host_id")
-        var userEntity: UserEntity?,
+        var hostEntity: UserEntity?,
 
         @ManyToOne
         @JoinColumn(name = "ward_id")
@@ -102,7 +102,10 @@ class PlaceEntity(
         var promoEntities: Set<PromoEntity>?,
 
         @OneToMany(mappedBy = "placeEntity", orphanRemoval = true)
-        var reviewEntities: Set<ReviewEntity>?
+        var reviewEntities: Set<ReviewEntity>?,
+
+        @OneToMany(mappedBy = "placeEntity")
+        var bookingEntities: Set<BookingEntity>?
 ) {
     @PreRemove
     private fun removePlaceFromPromo() {
@@ -155,7 +158,7 @@ class PlaceEntity(
             images = imageEntities?.sortedBy { it.id }?.map { it.url },
             amenities = amenityEntities?.sortedBy { it.id }?.map { it.id },
             bookingSlots = bookingSlotEntities?.sortedBy { it.date }?.map { it.toBookingSlot() },
-            hostDetail = userEntity?.toUserDetail(),
+            hostDetail = hostEntity?.toUserDetail(),
             wardDetail = wardEntity?.toWardDetail(),
             placeType = placeTypeEntity?.toPlaceType(),
             promos = promoEntities?.filter { it.startDate.before(Date()) && it.endDate.after(Date()) }

@@ -18,6 +18,11 @@ class PlaceExceptionController {
         return Response.buildResponseError(ApiError(HttpStatus.NOT_FOUND, exception))
     }
 
+    @ExceptionHandler(value = [PlaceSearchNotFoundException::class])
+    fun exception(exception: PlaceSearchNotFoundException): ResponseEntity<Any> {
+        return Response.buildResponseError(ApiError(HttpStatus.NOT_FOUND, exception))
+    }
+
     @ExceptionHandler(value = [PlaceIsExistsException::class])
     fun exception(exception: PlaceIsExistsException): ResponseEntity<Any> {
         return Response.buildResponseError(ApiError(HttpStatus.CONFLICT, exception))
@@ -31,6 +36,8 @@ class PlaceExceptionController {
 }
 
 class PlaceNotFoundException(id: Int) : RuntimeException("Place id not found : $id")
+
+class PlaceSearchNotFoundException(text: String) : RuntimeException("Place not found : $text")
 
 class PlaceIsExistsException(id: Int) : RuntimeException("Place is exist with id: $id")
 
