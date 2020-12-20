@@ -4,14 +4,31 @@ import com.ctr.homestaybooking.controller.place.dto.Place
 import com.ctr.homestaybooking.controller.place.dto.PlaceBody
 import com.ctr.homestaybooking.controller.place.dto.PlaceDetail
 import com.ctr.homestaybooking.entity.BookingDetail
+import com.ctr.homestaybooking.entity.PlaceEntity
 import com.ctr.homestaybooking.service.*
 import com.ctr.homestaybooking.shared.ROLE_ADMIN
 import com.ctr.homestaybooking.shared.ROLE_HOST
 import com.ctr.homestaybooking.shared.model.ApiData
+import com.ctr.homestaybooking.shared.model.PagingHeaders
+import com.ctr.homestaybooking.shared.model.PagingResponse
 import io.swagger.annotations.ApiOperation
+import net.kaczmarzyk.spring.data.jpa.domain.Equal
+import net.kaczmarzyk.spring.data.jpa.domain.GreaterThanOrEqual
+import net.kaczmarzyk.spring.data.jpa.domain.LessThanOrEqual
+import net.kaczmarzyk.spring.data.jpa.domain.LikeIgnoreCase
+import net.kaczmarzyk.spring.data.jpa.web.annotation.And
+import net.kaczmarzyk.spring.data.jpa.web.annotation.Spec
+import org.springframework.data.domain.Sort
+import org.springframework.data.jpa.domain.Specification
+import org.springframework.http.HttpHeaders
+import org.springframework.http.HttpStatus
+import org.springframework.http.MediaType
+import org.springframework.http.ResponseEntity
 import org.springframework.security.access.annotation.Secured
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
+import javax.transaction.Transactional
+
 
 /**
  * Created by at-trinhnguyen2 on 2020/10/19
@@ -100,5 +117,50 @@ class PlaceController(private val placeService: PlaceService,
     @ApiOperation(value = "Get calendar of place")
     fun getCalendarById(@PathVariable("id") id: Int): ApiData<String> {
         return ApiData(placeService.getCalendarById(id))
+    }
+
+    @Transactional
+    @GetMapping(value = ["search"], produces = [MediaType.APPLICATION_JSON_VALUE])
+    @ResponseStatus(HttpStatus.OK)
+    fun get(
+            @And(*[Spec(path = "id", params = ["id"], spec = Equal::class),
+                Spec(path = "name", params = ["name"], spec = LikeIgnoreCase::class),
+                Spec(path = "description", params = ["description"], spec = LikeIgnoreCase::class),
+                Spec(path = "address", params = ["address"], spec = LikeIgnoreCase::class),
+                Spec(path = "bookingType", params = ["bookingType"], spec = Equal::class),
+                Spec(path = "guestCount", params = ["guestCount"], spec = Equal::class),
+                Spec(path = "roomCount", params = ["roomCount"], spec = Equal::class),
+                Spec(path = "bedCount", params = ["bedCount"], spec = Equal::class),
+                Spec(path = "bathroomCount", params = ["bathroomCount"], spec = Equal::class),
+                Spec(path = "pricePerDay", params = ["minPrice"], spec = GreaterThanOrEqual::class),
+                Spec(path = "pricePerDay", params = ["maxPrice"], spec = LessThanOrEqual::class),
+                Spec(path = "cancelType", params = ["cancelType"], spec = Equal::class),
+                Spec(path = "status", params = ["status"], spec = Equal::class)
+            ])
+            spec: Specification<PlaceEntity>?,
+            sort: Sort,
+            @RequestHeader headers: HttpHeaders
+    ): ResponseEntity<List<Place>> {
+        return if (spec == null) {
+            ResponseEntity(placeService.getAllPlace().map { it.toPlace() }, HttpStatus.OK)
+        } else {
+            val response: PagingResponse = placeService.get(spec, headers, sort)
+            ResponseEntity(response.elements?.map { it.toPlace() }, returnHttpHeaders(response), HttpStatus.OK)
+        }
+    }
+
+    fun returnHttpHeaders(response: PagingResponse): HttpHeaders? {
+        val headers = HttpHeaders()
+        headers.set(PagingHeaders.COUNT.pageName, java.lang.String.valueOf(response.count))
+        headers.set(PagingHeaders.PAGE_SIZE.pageName, java.lang.String.valueOf(response.pageSize))
+        headers.set(PagingHeaders.PAGE_OFFSET.pageName, java.lang.String.valueOf(response.pageOffset))
+        headers.set(PagingHeaders.PAGE_NUMBER.pageName, java.lang.String.valueOf(response.pageNumber))
+        headers.set(PagingHeaders.PAGE_TOTAL.pageName, java.lang.String.valueOf(response.pageTotal))
+        return headers
+    }
+
+    @GetMapping("searchPlace")
+    fun searchPlace(@RequestParam("text") text: String): ApiData<List<Place>> {
+        return ApiData(placeService.searchPlace(text).map { it.toPlace() })
     }
 }

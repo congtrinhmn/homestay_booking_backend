@@ -2,6 +2,7 @@ package com.ctr.homestaybooking.service
 
 import com.ctr.homestaybooking.config.NotFoundException
 import com.ctr.homestaybooking.controller.place.PlaceNotFoundException
+import com.ctr.homestaybooking.controller.place.PlaceSearchNotFoundException
 import com.ctr.homestaybooking.controller.place.dto.RecommendResponse
 import com.ctr.homestaybooking.controller.user.UserNotFoundException
 import com.ctr.homestaybooking.entity.*
@@ -11,6 +12,8 @@ import com.ctr.homestaybooking.repository.UserRepository
 import com.ctr.homestaybooking.shared.*
 import com.ctr.homestaybooking.shared.enums.DateStatus
 import com.ctr.homestaybooking.shared.enums.PlaceStatus
+import com.ctr.homestaybooking.shared.model.PagingHeaders
+import com.ctr.homestaybooking.shared.model.PagingResponse
 import com.google.gson.Gson
 import net.fortuna.ical4j.data.CalendarOutputter
 import net.fortuna.ical4j.model.component.VEvent
@@ -19,6 +22,8 @@ import net.fortuna.ical4j.util.UidGenerator
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Sort
+import org.springframework.data.jpa.domain.Specification
+import org.springframework.http.HttpHeaders
 import org.springframework.stereotype.Service
 import org.springframework.web.client.RestTemplate
 import java.io.File
@@ -35,6 +40,9 @@ class PlaceService(private val placeRepository: PlaceRepository,
                    private val userRepository: UserRepository,
                    private val bookingRepository: BookingRepository
 ) {
+    fun getAllPlace(): List<PlaceEntity> {
+        return placeRepository.findByStatus(PlaceStatus.LISTED)
+    }
 
     fun getAllPlace(page: Int, size: Int, sortBy: String): List<PlaceEntity> {
         val paging: Pageable = PageRequest.of(page, size, Sort.by(sortBy))
@@ -186,6 +194,60 @@ class PlaceService(private val placeRepository: PlaceRepository,
                 file.delete()
             }
         }
+    }
+
+    /**
+     * get element using Criteria.
+     *
+     * @param spec    *
+     * @param headers pagination data
+     * @param sort    sort criteria
+     * @return retrieve elements with pagination
+     */
+    fun get(spec: Specification<PlaceEntity>, headers: HttpHeaders, sort: Sort): PagingResponse {
+        return if (isRequestPaged(headers)) {
+            get(spec, buildPageRequest(headers, sort))
+        } else {
+            val entities = get(spec, sort)
+            PagingResponse(entities.size.toLong(), 0, 0, 0L, 0, entities)
+        }
+    }
+
+    private fun isRequestPaged(headers: HttpHeaders): Boolean {
+        return headers.containsKey(PagingHeaders.PAGE_NUMBER.pageName) && headers.containsKey(PagingHeaders.PAGE_SIZE.pageName)
+    }
+
+    private fun buildPageRequest(headers: HttpHeaders, sort: Sort): Pageable {
+        val page = headers[PagingHeaders.PAGE_NUMBER.pageName]?.get(0)?.toInt() ?: 0
+        val size = headers[PagingHeaders.PAGE_SIZE.pageName]?.get(0)?.toInt() ?: 20
+        return PageRequest.of(page, size, sort)
+    }
+
+    /**
+     * get elements using Criteria.
+     *
+     * @param spec     *
+     * @param pageable pagination data
+     * @return retrieve elements with pagination
+     */
+    private fun get(spec: Specification<PlaceEntity>, pageable: Pageable): PagingResponse {
+        val page = placeRepository.findAll(spec, pageable)
+        val content = page.content
+        return PagingResponse(page.totalElements, page.number, page.numberOfElements, pageable.offset, page.totalPages, content)
+    }
+
+    /**
+     * get elements using Criteria.
+     *
+     * @param spec *
+     * @return elements
+     */
+    private fun get(spec: Specification<PlaceEntity>, sort: Sort): MutableList<PlaceEntity> {
+        return placeRepository.findAll(spec, sort)
+    }
+
+    fun searchPlace(text: String): List<PlaceEntity> {
+        return placeRepository.searchPlace(text) ?: throw PlaceSearchNotFoundException(text)
     }
 }
 

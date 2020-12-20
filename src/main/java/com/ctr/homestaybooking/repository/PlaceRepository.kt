@@ -14,6 +14,8 @@ interface PlaceRepository : JpaRepository<PlaceEntity, Int>, JpaSpecificationExe
 
     fun findByStatus(status: PlaceStatus, pageable: Pageable): List<PlaceEntity>
 
+    fun findByStatus(status: PlaceStatus): List<PlaceEntity>
+
     fun findByWardEntity(wardEntity: WardEntity): Set<PlaceEntity>
 
     @Query("""select * from places p
@@ -23,4 +25,9 @@ interface PlaceRepository : JpaRepository<PlaceEntity, Int>, JpaSpecificationExe
     fun findByDistrictId(id: Int): Set<PlaceEntity>?
 
     fun findByHostEntity(userEntity: UserEntity): Set<PlaceEntity>
+
+    @Query("""select * from places p where p.status = 'LISTED' and (
+            lower(p.address) like lower(concat('%', :text,'%'))
+            )""", nativeQuery = true)
+    fun searchPlace(text: String): List<PlaceEntity>?
 }

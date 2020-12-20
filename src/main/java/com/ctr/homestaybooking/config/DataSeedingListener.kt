@@ -33,9 +33,9 @@ class DataSeedingListener(private val userRepository: UserRepository,
 
     override fun onApplicationEvent(event: ContextRefreshedEvent) {
         Role.values().forEach { addRoleIfMissing(it) }
-        addUserIfMissing()
+        /*addUserIfMissing()
         Amenity.values().forEach { addAmenityIfMissing(it) }
-        placeTypes.forEach { addPlaceTypeIfMissing(it) }
+        placeTypes.forEach { addPlaceTypeIfMissing(it) }*/
 
         if (signingKey == null || signingKey.isEmpty()) {
             val jws = Jwts.builder()
