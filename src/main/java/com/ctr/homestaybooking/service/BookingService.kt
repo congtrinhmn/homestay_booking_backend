@@ -1,7 +1,10 @@
 package com.ctr.homestaybooking.service
 
 import com.ctr.homestaybooking.FirebaseMessage
-import com.ctr.homestaybooking.controller.booking.*
+import com.ctr.homestaybooking.controller.booking.BookingNotFoundException
+import com.ctr.homestaybooking.controller.booking.MessageException
+import com.ctr.homestaybooking.controller.booking.MethodNotSuccess
+import com.ctr.homestaybooking.controller.booking.PaymentRequiredException
 import com.ctr.homestaybooking.entity.BookingEntity
 import com.ctr.homestaybooking.repository.BookingRepository
 import com.ctr.homestaybooking.shared.*
@@ -102,7 +105,7 @@ class BookingService(private val bookingRepository: BookingRepository,
 
     fun changeBookingStatus(id: Int, bookingStatus: BookingStatus): BookingEntity {
         val bookingEntity = bookingRepository.findById(id).toNullable() ?: throw BookingNotFoundException(id)
-        if (bookingStatus == BookingStatus.PAID) throw MethodNotAllowedException()
+//        if (bookingStatus == BookingStatus.PAID) throw MethodNotAllowedException()
         bookingEntity.bookingStatus = bookingStatus
         return bookingRepository.save(bookingEntity).apply {
             when (bookingStatus) {
