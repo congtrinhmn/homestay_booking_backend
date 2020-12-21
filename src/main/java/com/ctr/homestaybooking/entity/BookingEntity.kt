@@ -69,7 +69,9 @@ class BookingEntity(
 
         var orderId: String? = null,
 
-        var transId: String? = null
+        var transId: String? = null,
+
+        var isReview: Boolean? = null
 ) {
     fun toBookingDetail() = BookingDetail(
             id = id,
@@ -89,8 +91,10 @@ class BookingEntity(
             promo = promoEntity?.toPromo(),
             review = reviewEntity?.toReview(),
             orderId = orderId,
-            transId = transId
+            transId = transId,
+            isReview = isReview
     )
+
     override fun toString() = toBookingDetail().toString()
 }
 
@@ -112,7 +116,8 @@ data class BookingDetail(
         var promo: Promo?,
         var review: Review?,
         var orderId: String?,
-        var transId: String?
+        var transId: String?,
+        var isReview: Boolean?
 )
 
 data class BookingBody(

@@ -27,6 +27,11 @@ class ReviewController(private val reviewService: ReviewService,
         return ApiData(reviewService.getReviewById(id).toReview())
     }
 
+    @GetMapping("/host/{id}")
+    fun getReviewByHostId(@PathVariable("id") id: Int): ApiData<List<Review>> {
+        return ApiData(reviewService.getReviewsHostId(id).map { it.toReview() })
+    }
+
     @PostMapping
     fun addReview(@RequestBody @Validated reviewBody: ReviewBody): ApiData<Review> {
         return ApiData(reviewService.addReview(reviewBody.toReviewEntity(bookingService)).toReview())
