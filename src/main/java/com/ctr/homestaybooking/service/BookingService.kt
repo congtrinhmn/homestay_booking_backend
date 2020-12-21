@@ -134,6 +134,16 @@ class BookingService(private val bookingRepository: BookingRepository,
                         ))
                     }
                 }
+                BookingStatus.COMPLETED -> {
+                    userEntity.deviceToken.let {
+                        fcmService.pushNotification(FirebaseMessage(
+                                "Đơn đặt chỗ ${this.id} đã hoàn thành",
+                                "${placeEntity.name}",
+                                it,
+                                mapOf("bookingId" to id).toJsonString()
+                        ))
+                    }
+                }
                 else -> {
 
                 }
